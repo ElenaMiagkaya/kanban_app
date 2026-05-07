@@ -1,0 +1,6 @@
+export { supabase } from './supabase/client'
+export { signUpWithEmail } from './auth/signUpWithEmail'
+export { signInWithEmail } from './auth/signInWithEmail'
+export { signOut } from './auth/signOut'
+export { getSession } from './auth/getSession'
+export { getCurrentUser } from './auth/getCurrentUser'

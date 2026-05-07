@@ -21,6 +21,7 @@ npm run dev
 ```
 
 ## Скрипты
+
 ```bash
 npm run lint:eslint   # проверка ESLint
 npm run lint:arch     # проверка архитектуры Steiger

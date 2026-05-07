@@ -1,9 +1,7 @@
+import { SignUpByEmail } from '@features/sign-up-by-email'
+
 const SignUpPage = () => {
-  return (
-    <div>
-      <h1>Я страница регистрации</h1>
-    </div>
-  )
+  return <SignUpByEmail />
 }
 
 export default SignUpPage
