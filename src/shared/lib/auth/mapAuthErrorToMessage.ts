@@ -12,8 +12,13 @@ export const mapAuthErrorToMessage = (error: unknown): string => {
       case maybeCode === 'user_already_exists':
       case maybeMessage?.includes('already exists') || maybeMessage?.includes('already registered'):
         return 'Пользователь с таким email уже зарегистрирован'
+      case maybeStatus === 400:
+      case maybeCode === 'invalid_credentials':
+      case maybeMessage?.includes('invalid credentials') ||
+        maybeMessage?.includes('invalid password'):
+        return 'Неверный email или пароль'
       default:
-        return 'Не удалось зарегистрироваться. Попробуйте еще раз'
+        return 'Не удалось выполнить операцию. Попробуйте еще раз'
     }
   }
   return 'Не удалось выполнить операцию. Попробуйте еще раз'

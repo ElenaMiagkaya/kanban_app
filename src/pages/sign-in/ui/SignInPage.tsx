@@ -1,9 +1,7 @@
+import SignInByEmail from '@features/sign-in-by-email/ui/SignInByEmail'
+
 const SignInPage = () => {
-  return (
-    <div>
-      <h1>Я страница входа</h1>
-    </div>
-  )
+  return <SignInByEmail />
 }
 
 export default SignInPage

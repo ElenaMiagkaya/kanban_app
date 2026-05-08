@@ -15,10 +15,11 @@ const SignUpByEmail = () => {
     setIsLoading(true)
     setErrorMessage(null)
 
-    const formData = new FormData(e.currentTarget) //создаем объект с данными из формы
+    const form = e.currentTarget // Ссылка на саму форму <form>
+    const formData = new FormData(form) // Браузер собирает все поля с атрибутом name
 
     const rawValues = {
-      email: String(formData.get('email') ?? ''),
+      email: String(formData.get('email') ?? ''), // Достает значение из <input name="email"
       password: String(formData.get('password') ?? ''),
       confirmPassword: String(formData.get('confirmPassword') ?? ''),
     }
@@ -31,8 +32,8 @@ const SignUpByEmail = () => {
     try {
       const { email, password } = parsed.data
       await signUpWithEmail(email, password)
-      e.currentTarget.reset()
-      navigate(ROUTES.profile)
+      form.reset()
+      navigate(ROUTES.profile, { replace: true }) // переходим на страницу профиля и заменяем страницу в истории браузера,чтобы пользователь не мог вернуться на страницу регистрации
     } catch (error) {
       setErrorMessage(mapAuthErrorToMessage(error))
     } finally {

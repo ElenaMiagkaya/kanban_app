@@ -4,7 +4,12 @@ import { z } from 'zod'
 export const signUpSchema = z
   .object({
     email: z.email({ message: 'Введите корректный email' }),
-    password: z.string().min(8, { message: 'Пароль должен быть не менее 8 символов' }),
+    password: z
+      .string()
+      .min(8, { message: 'Пароль должен быть не менее 8 символов' })
+      .regex(/^[\x00-\x7F]+$/, {
+        message: 'Пароль должен содержать только латинские буквы и цифры',
+      }),
     confirmPassword: z.string().min(8),
   })
   .refine((data) => data.password === data.confirmPassword, {
