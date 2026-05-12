@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '@/shared/lib/auth/session'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@shared/config'
+import { mapAuthErrorToMessage } from '@/shared/lib'
 
 const SignOut = () => {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ const SignOut = () => {
       await signOut()
       navigate(ROUTES.signIn, { replace: true })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Не удалось выйти из аккаунта')
+      setErrorMessage(mapAuthErrorToMessage(error))
     } finally {
       setIsProcessing(false)
     }
