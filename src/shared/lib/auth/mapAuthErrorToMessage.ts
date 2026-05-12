@@ -1,5 +1,6 @@
 export const mapAuthErrorToMessage = (error: unknown): string => {
   if (typeof error === 'object' && error !== null) {
+    // проверяем, есть ли статус в ошибке, код в ошибке и сообщение в ошибке
     const maybeStatus = 'status' in error ? error.status : undefined
     const maybeCode = 'code' in error ? error.code : undefined
     const maybeMessage =

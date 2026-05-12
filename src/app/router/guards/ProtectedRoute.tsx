@@ -1,6 +1,6 @@
-import { useAuth } from '@app/providers/auth/useAuth'
+import { useAuth } from '@/shared/lib/auth/session'
 import { Navigate } from 'react-router-dom'
-import { ROUTES } from '@shared/config'
+import { ROUTES } from '@/shared/config'
 import { Outlet } from 'react-router-dom'
 
 export const ProtectedRoute = () => {

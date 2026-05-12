@@ -1,7 +1,13 @@
-import SignInByEmail from '@features/sign-in-by-email/ui/SignInByEmail'
+import { SignInByEmail } from '@features/sign-in-by-email'
+import { NavigateToSignUp } from '@features/navigate-to-sign-up'
 
 const SignInPage = () => {
-  return <SignInByEmail />
+  return (
+    <div>
+      <SignInByEmail />
+      <NavigateToSignUp />
+    </div>
+  )
 }
 
 export default SignInPage
