@@ -11,8 +11,9 @@ const ProfilePage = () => {
     <div>
       <section>
         <h1>Мой профиль</h1>
-        <p>ФИО: Тут должно быть имя и фамилия пользователя</p>
-        <p>Email: {user?.email ?? ''}</p>
+        <p>ФИО: {user?.fullName ?? 'Добавьте имя и фамилию'}</p>
+        <p>Email: {user?.email ?? 'Добавьте email'}</p>
+        <p>Аватар: {user?.avatarUrl ?? 'Загрузите аватар'}</p>
       </section>
       <SignOut />
     </div>
