@@ -1,4 +1,4 @@
-export type User = {
+export interface Profile {
   id: string
   fullName: string
   email: string
