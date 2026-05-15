@@ -1,4 +1,10 @@
+import { isAuthNetworkError } from './isAuthNetworkError'
+
 export const mapAuthErrorToMessage = (error: unknown): string => {
+  // проверяем, является ли ошибка сетевой ошибкой
+  if (isAuthNetworkError(error)) {
+    return 'Сетевая ошибка. Попробуйте еще раз'
+  }
   if (typeof error === 'object' && error !== null) {
     // проверяем, есть ли статус в ошибке, код в ошибке и сообщение в ошибке
     const maybeStatus = 'status' in error ? error.status : undefined

@@ -5,7 +5,7 @@ import { useAuth } from '@shared/lib/auth/session'
 import { getProfileByUserId } from '@shared/api'
 
 const ProfileWidget = () => {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [profileLoading, setProfileLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -14,7 +14,7 @@ const ProfileWidget = () => {
     try {
       setError(null)
       setProfileLoading(true)
-      const profile = await getProfileByUserId(user?.id)
+      const profile = await getProfileByUserId(user.id)
       const newProfile: Profile = {
         id: profile.id,
         fullName: profile.full_name,
@@ -30,15 +30,16 @@ const ProfileWidget = () => {
   }
 
   useEffect(() => {
-    if (user) {
+    if (!isLoading && user) {
       fetchProfile()
-    } else {
+    }
+    if (!isLoading && !user) {
       setError('Пользователь не найден')
       setProfileLoading(false)
     }
-  }, [user?.id])
+  }, [user?.id, isLoading])
 
-  if (profileLoading) return <div>Загрузка профиля...</div>
+  if (profileLoading || isLoading) return <div>Загрузка профиля...</div>
   if (error) return <div>{error}</div>
   if (!profile) return <div>Профиль не найден</div>
 
