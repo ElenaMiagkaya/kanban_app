@@ -9,8 +9,8 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
     <article>
       <h1>Мой профиль</h1>
       <p>ФИО: {profile.fullName ?? 'Добавьте имя и фамилию'}</p>
-      <p>Email: {profile.email ?? 'Добавьте email'}</p>
-      <p>Аватар: {profile.avatarUrl ?? 'Загрузите аватар'}</p>
+      <p>Email: {profile.email || 'Добавьте email'}</p>
+      <p>Аватар: {profile.avatarUrl ?? 'Загрузите фото'}</p>
     </article>
   )
 }

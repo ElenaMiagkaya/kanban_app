@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "gen:types": "npx supabase gen types typescript --project-id xjyytfveutpaphsiadim > src/types/database.types.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

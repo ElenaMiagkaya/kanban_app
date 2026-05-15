@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { ProfileCard } from '@entities/profile'
-import type { Profile } from '@entities/profile'
+import { type Profile, ProfileCard, getProfile } from '@entities/profile'
 import { useAuth } from '@shared/lib/auth/session'
-import { getProfileByUserId } from '@shared/api'
 
 const ProfileWidget = () => {
   const { user, isLoading } = useAuth()
@@ -14,14 +12,8 @@ const ProfileWidget = () => {
     try {
       setError(null)
       setProfileLoading(true)
-      const profile = await getProfileByUserId(user.id)
-      const newProfile: Profile = {
-        id: profile.id,
-        fullName: profile.full_name,
-        email: user.email,
-        avatarUrl: profile.avatar_url,
-      }
-      setProfile(newProfile)
+      const profile = await getProfile(user.id, user.email)
+      setProfile(profile)
     } catch (error) {
       setError('Произошла ошибка при загрузке профиля')
     } finally {
