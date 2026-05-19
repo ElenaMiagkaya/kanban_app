@@ -1,70 +1,66 @@
 # Kanban App
 
-Учебный pet-проект Kanban-доски для портфолио.  
-Текущий этап: собран архитектурный и навигационный каркас до интеграции Supabase.
+Учебный pet-проект Kanban-доски для портфолио на **Feature-Sliced Design**.
+
+**Текущий этап:** Supabase (auth + Postgres + RLS), загрузка профиля через TanStack Query. Дальше — список projects и канбан.
+
+Подробный прогресс и план: **[docs/ROADMAP.md](./docs/ROADMAP.md)**
 
 ## Стек
 
-- React
-- TypeScript
-- Vite
-- React Router (`createBrowserRouter`, `RouterProvider`, `Outlet`)
-- Feature-Sliced Design (FSD)
-- ESLint + Prettier
-- Steiger (архитектурные проверки FSD)
+- React 19, TypeScript, Vite
+- React Router v7 (`createBrowserRouter`, `RouterProvider`)
+- Supabase (Auth + Postgres + RLS)
+- TanStack Query (+ DevTools в dev)
+- Zod (валидация форм)
+- FSD, ESLint, Prettier, Steiger
 
-## Запуск проекта
+## Запуск
 
-```bash
-npm install
-npm run dev
-```
+1. Создай файл `.env` в корне `kanban-app` (значения — в Supabase Dashboard → Project Settings → API):
+
+   ```env
+   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+   VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+   ```
+
+2. Установка и dev-сервер:
+
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 ## Скрипты
 
 ```bash
-npm run lint:eslint   # проверка ESLint
-npm run lint:arch     # проверка архитектуры Steiger
+npm run dev           # dev-сервер
+npm run build         # production-сборка
 npm run lint          # ESLint + Steiger
-npm run format:check  # проверка форматирования Prettier
-npm run format        # автоформатирование Prettier
+npm run lint:eslint   # только ESLint
+npm run lint:arch     # только Steiger (FSD)
+npm run format        # Prettier
+npm run format:check
+npm run gen:types     # типы БД из Supabase → src/types/database.types.ts
 ```
 
-# Что уже сделано (до Supabase)
+Перед `gen:types` нужен вход в Supabase CLI: `npx supabase login`.
 
-- Проект инициализирован на React + TypeScript + Vite
-- Настроены алиасы для слоев FSD:
-  - `@app`
-  - `@pages`
-  - `@widgets`
-  - `@features`
-  - `@entities`
-  - `@shared`
-- Подключены и настроены ESLint + Prettier
-- Подключен Steiger с мягким профилем правил на этапе MVP
-- Реализована базовая структура по FSD
-- Слайсы разложены по сегментам `ui` / `model` (где применимо)
-- Настроен роутинг через `createBrowserRouter` + `RouterProvider`
-- Реализованы страницы:
-  - `/sign-in`
-  - `/sign-up`
-  - `/profile`
-  - `/project/:projectId`
-  - `*` (ErrorPage)
-- Добавлен `AppLayout` и вложенная маршрутизация через `Outlet`
-- Созданы базовые доменные типы:
-  - `User`
-  - `Project`
-  - `Board`
-  - `Column`
-  - `Task`
-- Добавлены временные моки для раннего этапа разработки (`entities/user/model/mockUser.ts`)
+## FSD-слои
 
-## FSD-слои проекта
+| Слой       | Назначение                         |
+| ---------- | ---------------------------------- |
+| `app`      | провайдеры, роутинг, guards        |
+| `pages`    | страницы-маршруты                  |
+| `widgets`  | крупные блоки UI                   |
+| `features` | действия пользователя              |
+| `entities` | сущности, модели, запросы сущности |
+| `shared`   | api, lib, config, ui               |
 
-- `app` — точка входа, провайдеры, роутинг
-- `pages` — маршрутные экраны
-- `widgets` — крупные UI-блоки
-- `features` — пользовательские действия
-- `entities` — бизнес-сущности и их модели
-- `shared` — переиспользуемая инфраструктура (`config` / `ui` / `lib` / `api`)
+## Что уже есть (кратко)
+
+- Роутинг и layout, auth (вход / регистрация / выход), защищённые маршруты
+- Профиль: загрузка из `profiles` + email из сессии, `useProfile`
+- Сгенерированные типы Supabase, маппер `Profile` из строки БД
+
+Полный список по этапам — в **[docs/ROADMAP.md](./docs/ROADMAP.md)**.
