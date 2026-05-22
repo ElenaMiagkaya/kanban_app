@@ -9,7 +9,17 @@ const ProfileWidget = () => {
   if (isError) return <div>Произошла ошибка при загрузке профиля</div> // если ошибка, выводим сообщение
   if (!profile) return <div>Профиль не найден</div> // если профиль не найден, выводим сообщение
 
-  return <ProfileCard profile={profile} />
+  return (
+    <ProfileCard
+      profile={profile}
+      slots={{
+        avatarActions: null,
+        nameSlot: null,
+        emailActions: null,
+        passwordActions: null,
+      }}
+    />
+  )
 }
 
 export default ProfileWidget

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Sidebar } from '@widgets/sidebar'
 
 type AppLayoutProps = {
   children: ReactNode
@@ -7,7 +8,10 @@ type AppLayoutProps = {
 const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div>
-      <h1>я хэдер</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h1>я хэдер</h1>
+        <Sidebar />
+      </div>
       {children}
     </div>
   )

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getInitials } from '../lib/ui/profile/getInitials'
+import { getInitials } from '../lib/profile/getInitials'
 
 interface UserAvatarProps {
   src?: string

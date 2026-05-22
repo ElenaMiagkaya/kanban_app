@@ -79,8 +79,8 @@ ProfileCard
 - [x] TanStack Query: `QueryProvider`, `queryClient` с базовыми `defaultOptions`
 - [x] `useProfile`, опции кеша (`staleTime`, `refetchOnMount` / `refetchOnReconnect: false`)
 - [x] `profileKeys` + `queryKey: profileKeys.detail(...)` в `useProfile`
-- [ ] `shared/api`: `updateProfileByUserId`
-- [ ] `entities/profile`: `updateProfile`, **`useUpdateProfile`**, после успеха `setQueryData(profileKeys.detail(id), …)`
+- [x] `shared/api`: `updateProfileByUserId`
+- [x] `entities/profile`: `updateProfile`, **`useUpdateProfile`**, после успеха `setQueryData(profileKeys.detail(id), …)`
 
 `ProfileCard`, `UserAvatar`, слоты и сборка в `ProfileWidget` — в **блоках 1–3** (здесь не дублировать).
 
@@ -97,8 +97,8 @@ ProfileCard
 
 **Entity (`ProfileCard`):**
 
-- [ ] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот **`userAvatar` не нужен**)
-- [ ] Объект `slots` для фич; без кнопок upload/remove и без inline-`<img>` в entity
+- [x] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот **`userAvatar` не нужен**)
+- [x] Объект `slots` для фич; без кнопок upload/remove и без inline-`<img>` в entity
 
 **Features** (после **инфраструктуры mutation**):
 

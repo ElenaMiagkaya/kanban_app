@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { getProfile } from './getProfile'
 import { useAuth } from '@shared/lib/auth/session'
 import { profileKeys } from './profileKeys'
+import type { Profile } from '../model/types'
 
 export const useProfile = () => {
   const auth = useAuth()
-  const query = useQuery({
+  const query = useQuery<Profile, Error>({
     queryKey: profileKeys.detail(auth.user?.id ?? ''), //ключ для запроса, который будет использоваться в queryClient
     queryFn: () => getProfile(auth.user!.id, auth.user!.email), //! - это безопасный доступ к свойству user, так как мы знаем, что user не может быть null
     enabled: !auth.isLoading && auth.isAuth && Boolean(auth.user?.id), //enabled: true - это значит, что запрос будет выполнен, если условие истинно

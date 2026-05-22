@@ -19,10 +19,16 @@ const ProfileCard = ({ profile, slots }: ProfileCardProps) => {
   return (
     <article style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <h1>Профиль</h1>
-      <UserAvatar src={profile.avatarUrl} name={profile.fullName} size={100} />
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <UserAvatar src={profile.avatarUrl} name={profile.fullName} size={100} />
+        {slots.avatarActions}
+      </div>
+      {slots.nameSlot}
       <div style={{ display: 'flex', gap: '10px' }}>
         <p>Email: {profile.email || 'Добавьте email'}</p>
+        {slots.emailActions}
       </div>
+      {slots.passwordActions}
     </article>
   )
 }
