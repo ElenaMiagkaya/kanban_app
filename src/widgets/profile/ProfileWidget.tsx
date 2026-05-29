@@ -1,4 +1,6 @@
 import { useProfile, ProfileCard } from '@entities/profile'
+import { UploadAvatar } from '@features/upload-avatar'
+import { RemoveAvatar } from '@features/remove-avatar'
 
 const ProfileWidget = () => {
   const { user, isLoading, data: profile, isPending, isError } = useProfile()
@@ -13,7 +15,12 @@ const ProfileWidget = () => {
     <ProfileCard
       profile={profile}
       slots={{
-        avatarActions: null,
+        avatarActions: (
+          <>
+            <UploadAvatar />
+            <RemoveAvatar />
+          </>
+        ),
         nameSlot: null,
         emailActions: null,
         passwordActions: null,
