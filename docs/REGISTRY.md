@@ -33,7 +33,7 @@ app
 └── router → pages
 
 Профиль
-ProfilePage → ProfileWidget → useProfile → getProfile → getProfileByUserId
+ProfilePage → ProfileWidget → useProfile → getProfile → getProfileByUserId (withRetry)
                               → ProfileCard → UserAvatar
                               → UploadAvatar / RemoveAvatar (слоты)
 
@@ -49,24 +49,25 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 1.1 API — `shared/api`
 
-| Имя                     | Файл                                          | Тип    | Статус | Назначение                            | Вызывает                                       | Кто использует               |
-| ----------------------- | --------------------------------------------- | ------ | ------ | ------------------------------------- | ---------------------------------------------- | ---------------------------- |
-| `supabase`              | `shared/api/supabase/client.ts`               | клиент | ✅     | Supabase JS client + типы БД          | `createClient`, env `VITE_*`                   | все API, `AuthProvider`      |
-| `signUpWithEmail`       | `shared/api/auth/signUpWithEmail.ts`          | API    | ✅     | Регистрация email/password            | `withRetry` → `supabase.auth.signUp`           | `SignUpByEmail`              |
-| `signInWithEmail`       | `shared/api/auth/signInWithEmail.ts`          | API    | ✅     | Вход email/password                   | `withRetry` → `supabase.auth.signInWithPassword` | `SignInByEmail`            |
-| `signOut`               | `shared/api/auth/signOut.ts`                  | API    | ✅     | Выход, сброс сессии                   | `withRetry` → `supabase.auth.signOut`          | `AuthProvider.handleSignOut` |
-| `getSession`            | `shared/api/auth/getSession.ts`               | API    | ✅     | Текущая сессия                        | `withRetry` → `supabase.auth.getSession`       | `AuthProvider.refreshAuth`   |
-| `getCurrentUser`        | `shared/api/auth/getCurrentUser.ts`           | API    | ✅     | User с проверкой JWT на сервере       | `withRetry` → `supabase.auth.getUser`          | резерв                       |
-| `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `supabase.from('profiles')`                    | `getProfile`                 |
-| `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `supabase.from('profiles').update`             | `updateProfile`              |
-| `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl` | `useUploadAvatar`            |
-| `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                 | `useRemoveAvatar`            |
+| Имя                     | Файл                                          | Тип    | Статус | Назначение                            | Вызывает                                         | Кто использует               |
+| ----------------------- | --------------------------------------------- | ------ | ------ | ------------------------------------- | ------------------------------------------------ | ---------------------------- |
+| `supabase`              | `shared/api/supabase/client.ts`               | клиент | ✅     | Supabase JS client + типы БД          | `createClient`, env `VITE_*`                     | все API, `AuthProvider`      |
+| `signUpWithEmail`       | `shared/api/auth/signUpWithEmail.ts`          | API    | ✅     | Регистрация email/password            | `withRetry` → `supabase.auth.signUp`             | `SignUpByEmail`              |
+| `signInWithEmail`       | `shared/api/auth/signInWithEmail.ts`          | API    | ✅     | Вход email/password                   | `withRetry` → `supabase.auth.signInWithPassword` | `SignInByEmail`              |
+| `signOut`               | `shared/api/auth/signOut.ts`                  | API    | ✅     | Выход, сброс сессии                   | `withRetry` → `supabase.auth.signOut`            | `AuthProvider.handleSignOut` |
+| `getSession`            | `shared/api/auth/getSession.ts`               | API    | ✅     | Текущая сессия                        | `withRetry` → `supabase.auth.getSession`         | `AuthProvider.refreshAuth`   |
+| `getCurrentUser`        | `shared/api/auth/getCurrentUser.ts`           | API    | ✅     | User с проверкой JWT на сервере       | `withRetry` → `supabase.auth.getUser`            | резерв                       |
+| `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                 |
+| `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`              |
+| `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`            |
+| `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`            |
+
 ### 1.2 Lib — `shared/lib`
 
 | Имя                     | Файл                                         | Тип     | Статус | Назначение                          | Вызывает                                         | Кто использует                                |
 | ----------------------- | -------------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------ | --------------------------------------------- |
 | `isNetworkError`        | `shared/lib/network/isNetworkError.ts`       | утилита | ✅     | Сетевая ли ошибка (retry + auth UI) | маркеры в `message`, `isAuthRetryableFetchError` | `withRetry`, `mapAuthErrorToMessage`          |
-| `withRetry`             | `shared/lib/retry/withRetry.ts`              | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, `uploadAvatarFile`, `removeAvatarFile` |
+| `withRetry`             | `shared/lib/retry/withRetry.ts`              | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, profile API, Storage API            |
 | `mapAuthErrorToMessage` | `shared/lib/auth/mapAuthErrorToMessage.ts`   | утилита | ✅     | Текст ошибки для auth UI            | `isNetworkError` + коды Supabase                 | `SignInByEmail`, `SignUpByEmail`, `SignOut`   |
 | `getInitials`           | `shared/lib/profile/getInitials.ts`          | утилита | ✅     | Инициалы из имени                   | —                                                | `UserAvatar`                                  |
 | `useAuth`               | `shared/lib/auth/session/useAuth.ts`         | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut` |
@@ -197,7 +198,7 @@ UploadAvatar
   → fileSchema (Zod)
   → useUploadAvatar.mutate(file)
       → uploadAvatarFile (withRetry → Storage)
-      → updateProfile → updateProfileByUserId
+      → updateProfile → updateProfileByUserId (withRetry)
       → onSuccess: setQueryData(profileKeys.detail)
 ProfileCard / Sidebar ← useProfile (тот же cache)
 ```
@@ -207,7 +208,7 @@ ProfileCard / Sidebar ← useProfile (тот же cache)
 ```
 ProfileWidget / Sidebar
   → useProfile (enabled: auth ready)
-      → getProfile → getProfileByUserId
+      → getProfile → getProfileByUserId (withRetry)
       → mapProfileRowToProfile (+ email из useAuth)
 ```
 
@@ -228,6 +229,7 @@ AuthProvider.refreshAuth
 
 ## Changelog registry
 
+- **2026-05-29:** `withRetry` на profile API (`getProfileByUserId`, `updateProfileByUserId`)
 - **2026-05-29:** `withRetry` на auth API (`getSession`, sign-in/up/out, `getCurrentUser`); ROADMAP — блок 1 готов, фокус блок 2
 - **2026-05-30:** первый `REGISTRY.md`; avatar Storage, `withRetry`, `isNetworkError`; синхронизация с Canvas
 - **2026-05-29:** upload/remove аватар, профиль на `/profile`

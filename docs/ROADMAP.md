@@ -25,13 +25,13 @@
 
 ### Как устроены слои (для первого раза)
 
-| Слой               | Роль                                                                                                                                                               |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `shared/ui`        | **`UserAvatar`** — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                            |
+| Слой               | Роль                                                                                                                                                            |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared/ui`        | **`UserAvatar`** — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                         |
 | `entities/profile` | `Profile`, `useProfile`, `updateProfile`, **`ProfileCard`** — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
-| `features/*`       | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                           |
-| `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                       |
-| `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                   |
+| `features/*`       | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                        |
+| `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                    |
+| `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                |
 
 **Неплоский виджет** = `ProfileWidget` рендерит **один** `ProfileCard` и прокидывает фичи так:
 
