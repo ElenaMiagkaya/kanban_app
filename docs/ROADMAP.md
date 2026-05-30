@@ -2,6 +2,8 @@
 
 Живая дорожная карта проекта. В новом чате с ассистентом: **«продолжаем по docs/ROADMAP.md»**.
 
+**Карта модулей:** [REGISTRY.md](./REGISTRY.md) · интерактивно: `canvases/kanban-app-registry.canvas.tsx`
+
 **Текущий фокус:** профиль на `/profile` — неплоский `ProfileWidget` (слоты в `ProfileCard`) + фичи по блокам; затем projects.
 
 ---

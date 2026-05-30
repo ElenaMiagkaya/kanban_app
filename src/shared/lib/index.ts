@@ -1,2 +1,3 @@
 export { mapAuthErrorToMessage } from './auth/mapAuthErrorToMessage'
-export { isAuthNetworkError } from './auth/isAuthNetworkError'
+export { isNetworkError } from './network/isNetworkError'
+export { withRetry } from './retry/withRetry'

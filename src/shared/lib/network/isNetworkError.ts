@@ -19,13 +19,13 @@ const hasNetworkLikeMessage = (message: string): boolean => {
   return NETWORK_MESSAGE_MARKERS.some((marker) => normalized.includes(marker))
 }
 
-export const isAuthNetworkError = (error: unknown): boolean => {
+export const isNetworkError = (error: unknown): boolean => {
   if (isAuthRetryableFetchError(error)) {
     return true
   }
 
   if (error instanceof AuthUnknownError) {
-    return isAuthNetworkError(error.originalError)
+    return isNetworkError(error.originalError)
   }
 
   if (error instanceof TypeError) {
@@ -42,6 +42,13 @@ export const isAuthNetworkError = (error: unknown): boolean => {
     (error.name === 'NetworkError' || hasNetworkLikeMessage(error.message))
   ) {
     return true
+  }
+
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = error.message
+    if (typeof message === 'string' && hasNetworkLikeMessage(message)) {
+      return true
+    }
   }
 
   return false

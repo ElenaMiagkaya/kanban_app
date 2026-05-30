@@ -1,8 +1,8 @@
-import { isAuthNetworkError } from './isAuthNetworkError'
+import { isNetworkError } from '../network/isNetworkError'
 
 export const mapAuthErrorToMessage = (error: unknown): string => {
   // проверяем, является ли ошибка сетевой ошибкой
-  if (isAuthNetworkError(error)) {
+  if (isNetworkError(error)) {
     return 'Сетевая ошибка. Попробуйте еще раз'
   }
   if (typeof error === 'object' && error !== null) {
