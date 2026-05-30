@@ -4,17 +4,17 @@
 
 **Карта модулей:** [REGISTRY.md](./REGISTRY.md) · интерактивно: `canvases/kanban-app-registry.canvas.tsx`
 
-**Текущий фокус:** профиль на `/profile` — неплоский `ProfileWidget` (слоты в `ProfileCard`) + фичи по блокам; затем projects.
+**Текущий фокус:** **блок 2** — `edit-profile-name` → слот `nameSlot` в `ProfileCard`. Блок 1 (аватар) и retry auth API — готовы.
 
 ---
 
 ## Порядок работ (кратко)
 
 1. [x] `profileKeys`, `useProfile`
-2. **Блок 1 (UI):** `shared/ui/UserAvatar`, `ProfileCard` со слотами, `Sidebar` — без mutation
-3. **Инфра mutation:** `updateProfileByUserId`, `useUpdateProfile`, `setQueryData` — перед upload/remove и блоком 2
-4. **Блок 1 (фичи):** upload/remove аватара + `avatarActions` в `ProfileWidget`
-5. **Блок 2 — имя:** `edit-profile-name` → слот `nameSlot`
+2. [x] **Блок 1 (UI):** `UserAvatar`, `ProfileCard` со слотами, `Sidebar`
+3. [x] **Инфра mutation:** `updateProfileByUserId`, `updateProfile`, `setQueryData`
+4. [x] **Блок 1 (фичи):** upload/remove аватара (Storage + `profiles.avatar_url`) + `avatarActions`
+5. **Блок 2 — имя:** `edit-profile-name` → слот `nameSlot` ← **сейчас**
 6. **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`)
 7. Список projects на `/profile` + `useProjects`
 8. «Создать проект», `project/:id`, канбан
@@ -28,7 +28,7 @@
 | Слой               | Роль                                                                                                                                                               |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `shared/ui`        | **`UserAvatar`** — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                            |
-| `entities/profile` | `Profile`, `useProfile`, `useUpdateProfile`, **`ProfileCard`** — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
+| `entities/profile` | `Profile`, `useProfile`, `updateProfile`, **`ProfileCard`** — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
 | `features/*`       | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                           |
 | `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                       |
 | `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                   |
@@ -82,7 +82,7 @@ ProfileCard
 - [x] `useProfile`, опции кеша (`staleTime`, `refetchOnMount` / `refetchOnReconnect: false`)
 - [x] `profileKeys` + `queryKey: profileKeys.detail(...)` в `useProfile`
 - [x] `shared/api`: `updateProfileByUserId`
-- [x] `entities/profile`: `updateProfile`, **`useUpdateProfile`**, после успеха `setQueryData(profileKeys.detail(id), …)`
+- [x] `entities/profile`: `updateProfile`; оркестраторы аватара вызывают его напрямую → `setQueryData(profileKeys.detail(id), …)`
 
 `ProfileCard`, `UserAvatar`, слоты и сборка в `ProfileWidget` — в **блоках 1–3** (здесь не дублировать).
 
@@ -104,13 +104,15 @@ ProfileCard
 
 **Features** (после **инфраструктуры mutation**):
 
-- [ ] `features/remove-avatar` — `avatar_url: null`, `useUpdateProfile`
-- [ ] `features/upload-avatar` — MVP: URL → `avatar_url`; позже опционально Supabase Storage
+- [x] `features/remove-avatar` — `removeAvatarFile` → `updateProfile({ avatar_url: null })` → `setQueryData`
+- [x] `features/upload-avatar` — `uploadAvatarFile` (Storage `avatars/{userId}/avatar.jpg`) → `updateProfile({ avatar_url })` → `setQueryData`
+- [x] `userId` из `useAuth` (не из `useProfile`); features не импортируют друг друга
+- [x] `withRetry` в `shared/api/storage`; `mutationKey` + `useIsMutating({ mutationKey: ['avatar'] })`
 
 **Виджеты:**
 
-- [ ] `ProfileWidget`: в `slots.avatarActions` — обе фичи; довести все слоты по мере блоков 2–3
-- [ ] `Sidebar`: `<UserAvatar />` (данные из `useProfile` или кеша; без upload/remove)
+- [x] `ProfileWidget`: `slots.avatarActions` — `UploadAvatar`, `RemoveAvatar`; `nameSlot` / email / password — заглушки `null` до блоков 2–3
+- [x] `Sidebar`: `<UserAvatar />` из `useProfile` / кеша, без upload/remove
 
 ---
 
@@ -191,7 +193,6 @@ ProfilePage
 
 ## Полировка (когда появится потребность)
 
-- [ ] Retry сети в `shared/api/auth` (`withAuthNetworkRetry` + `isAuthNetworkError`)
 - [ ] Маппер ошибок загрузки профиля / Supabase (не сырой `error.message`)
 - [ ] `useMutation` для sign-in / sign-up / sign-out; при `signOut` — `queryClient.removeQueries` / `clear`
 - [ ] Lazy routes, Steiger строже
@@ -223,21 +224,19 @@ ProfilePage
 ### Auth
 
 - [x] API: `signUpWithEmail`, `signInWithEmail`, `signOut`, `getSession`, `getCurrentUser`
+- [x] Auth API обёрнуты в `withRetry` (дефолт `shouldRetry: isNetworkError`); отдельный `withAuthNetworkRetry` не нужен
 - [x] `AuthProvider`, `useAuth`, подписка `onAuthStateChange`
 - [x] Фичи: sign-in / sign-up по email (Zod), sign-out, ссылка на регистрацию
-- [x] `mapAuthErrorToMessage`, `isAuthNetworkError` (отдельное сообщение для сетевых ошибок)
-- [ ] `withAuthNetworkRetry` в auth API — в плане (полировка)
+- [x] `mapAuthErrorToMessage`, `isNetworkError` (сетевые ошибки в UI auth)
 
-### Профиль (чтение)
+### Профиль
 
 - [x] Таблица `profiles`, RLS, триггер на `auth.users`
 - [x] `getProfileByUserId` (shared/api), `getProfile` + `mapProfileRowToProfile` (entities)
-- [x] Доменная модель `Profile`, `ProfileCard`, `ProfileWidget`
-- [x] `useProfile` (TanStack Query + `enabled` под auth)
-- [x] `profileKeys`
+- [x] Доменная модель `Profile`, `ProfileCard` со слотами, `ProfileWidget`, `UserAvatar`, `Sidebar`
+- [x] `useProfile` (TanStack Query + `enabled` под auth), `profileKeys`, `updateProfile`
 - [x] Email в UI из сессии, не из таблицы `profiles`
-- [x] Черновик макета `ProfileCard` (аватар, кнопки, поле имени) — рефакторинг под слоты, `UserAvatar` и features (блоки 1–3)
-- [ ] `shared/ui/UserAvatar` — блок 1
+- [x] **Блок 1 — аватар:** Storage + `avatar_url`, `upload-avatar` / `remove-avatar`, слот `avatarActions`
 
 ### TanStack Query
 

@@ -2,15 +2,15 @@
 
 Учебный pet-проект Kanban-доски для портфолио на **Feature-Sliced Design**.
 
-**Текущий этап:** Supabase (auth + Postgres + RLS), загрузка профиля через TanStack Query. Дальше — список projects и канбан.
+**Текущий этап:** профиль на `/profile` (аватар через Supabase Storage, слоты в `ProfileCard`). Следующий шаг — редактирование имени (блок 2), затем projects и канбан.
 
-Подробный прогресс и план: **[docs/ROADMAP.md](./docs/ROADMAP.md)**
+Подробный прогресс: **[docs/ROADMAP.md](./docs/ROADMAP.md)** · карта модулей: **[docs/REGISTRY.md](./docs/REGISTRY.md)** · интерактивно: `../canvases/kanban-app-registry.canvas.tsx`
 
 ## Стек
 
 - React 19, TypeScript, Vite
 - React Router v7 (`createBrowserRouter`, `RouterProvider`)
-- Supabase (Auth + Postgres + RLS)
+- Supabase (Auth + Postgres + Storage + RLS)
 - TanStack Query (+ DevTools в dev)
 - Zod (валидация форм)
 - FSD, ESLint, Prettier, Steiger
@@ -59,8 +59,9 @@ npm run gen:types     # типы БД из Supabase → src/types/database.types
 
 ## Что уже есть (кратко)
 
-- Роутинг и layout, auth (вход / регистрация / выход), защищённые маршруты
-- Профиль: загрузка из `profiles` + email из сессии, `useProfile`
+- Роутинг и layout, auth (вход / регистрация / выход), guards, `AuthProvider`
+- Auth и Storage API: повтор при сетевых ошибках (`withRetry` + `isNetworkError`)
+- Профиль: `useProfile`, `ProfileCard` со слотами, upload/remove аватара, `UserAvatar` в sidebar
 - Сгенерированные типы Supabase, маппер `Profile` из строки БД
 
-Полный список по этапам — в **[docs/ROADMAP.md](./docs/ROADMAP.md)**.
+Полный список — в **[docs/ROADMAP.md](./docs/ROADMAP.md)** и **[docs/REGISTRY.md](./docs/REGISTRY.md)**.
