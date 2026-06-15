@@ -23,7 +23,7 @@ const ProfileCard = ({ profile, slots }: ProfileCardProps) => {
         <UserAvatar src={profile.avatarUrl} name={profile.fullName} size={100} />
         {slots.avatarActions}
       </div>
-      {slots.nameSlot}
+      <div style={{ display: 'flex', gap: '10px' }}>{slots.nameSlot}</div>
       <div style={{ display: 'flex', gap: '10px' }}>
         <p>Email: {profile.email || 'Добавьте email'}</p>
         {slots.emailActions}

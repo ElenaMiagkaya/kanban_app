@@ -35,7 +35,8 @@ app
 Профиль
 ProfilePage → ProfileWidget → useProfile → getProfile → getProfileByUserId (withRetry)
                               → ProfileCard → UserAvatar
-                              → UploadAvatar / RemoveAvatar (слоты)
+                              → UploadAvatar / RemoveAvatar (avatarActions)
+                              → UpdateName (nameSlot)
 
 Auth
 SignInByEmail → signInWithEmail (withRetry) → supabase.auth
@@ -127,37 +128,39 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 3.1 Entity — `entities/profile`
 
-| Имя                      | Файл                                               | Тип        | Статус | Назначение                            | Вызывает                                       | Кто использует                       |
-| ------------------------ | -------------------------------------------------- | ---------- | ------ | ------------------------------------- | ---------------------------------------------- | ------------------------------------ |
-| `Profile`                | `entities/profile/model/types.ts`                  | тип        | ✅     | Домен: id, fullName, email, avatarUrl | —                                              | везде в профиле                      |
-| `UpdateProfileInput`     | `entities/profile/api/updateProfile.ts`            | тип        | ✅     | `avatar_url` или `full_name`          | —                                              | `updateProfile`                      |
-| `profileKeys`            | `entities/profile/api/profileKeys.ts`              | TSQ keys   | ✅     | `['profile', id]`                     | —                                              | `useProfile`, mutations              |
-| `mapProfileRowToProfile` | `entities/profile/model/mapProfileRowToProfile.ts` | маппер     | ✅     | Row БД → `Profile`                    | —                                              | `getProfile`, `updateProfile`        |
-| `getProfile`             | `entities/profile/api/getProfile.ts`               | API entity | ✅     | Профиль из БД + email из сессии       | `getProfileByUserId`, `mapProfileRowToProfile` | `useProfile`                         |
-| `updateProfile`          | `entities/profile/api/updateProfile.ts`            | API entity | ✅     | UPDATE профиля → `Profile`            | `updateProfileByUserId`, маппер                | `useUploadAvatar`, `useRemoveAvatar` |
-| `useProfile`             | `entities/profile/api/useProfile.ts`               | хук        | ✅     | Query профиля                         | `useAuth`, `getProfile`, `profileKeys`         | `ProfileWidget`, `Sidebar`           |
-| `ProfileCard`            | `entities/profile/ui/ProfileCard.tsx`              | UI         | ✅     | Layout профиля + слоты                | `UserAvatar`                                   | `ProfileWidget`                      |
+| Имя                      | Файл                                               | Тип        | Статус | Назначение                            | Вызывает                                       | Кто использует                                        |
+| ------------------------ | -------------------------------------------------- | ---------- | ------ | ------------------------------------- | ---------------------------------------------- | ----------------------------------------------------- |
+| `Profile`                | `entities/profile/model/types.ts`                  | тип        | ✅     | Домен: id, fullName, email, avatarUrl | —                                              | везде в профиле                                       |
+| `UpdateProfileInput`     | `entities/profile/api/updateProfile.ts`            | тип        | ✅     | `avatar_url` или `full_name`          | —                                              | `updateProfile`                                       |
+| `profileKeys`            | `entities/profile/api/profileKeys.ts`              | TSQ keys   | ✅     | `['profile', id]`                     | —                                              | `useProfile`, mutations                               |
+| `mapProfileRowToProfile` | `entities/profile/model/mapProfileRowToProfile.ts` | маппер     | ✅     | Row БД → `Profile`                    | —                                              | `getProfile`, `updateProfile`                         |
+| `getProfile`             | `entities/profile/api/getProfile.ts`               | API entity | ✅     | Профиль из БД + email из сессии       | `getProfileByUserId`, `mapProfileRowToProfile` | `useProfile`                                          |
+| `updateProfile`          | `entities/profile/api/updateProfile.ts`            | API entity | ✅     | UPDATE профиля → `Profile`            | `updateProfileByUserId`, маппер                | `useUploadAvatar`, `useRemoveAvatar`, `useUpdateName` |
+| `useProfile`             | `entities/profile/api/useProfile.ts`               | хук        | ✅     | Query профиля                         | `useAuth`, `getProfile`, `profileKeys`         | `ProfileWidget`, `Sidebar`                            |
+| `ProfileCard`            | `entities/profile/ui/ProfileCard.tsx`              | UI         | ✅     | Layout профиля + слоты                | `UserAvatar`                                   | `ProfileWidget`                                       |
 
-### 3.2 Features — аватар
+### 3.2 Features — профиль (аватар, имя)
 
-| Имя                 | Файл                                              | Тип     | Статус | Назначение                 | Вызывает                                                   | Кто использует         |
-| ------------------- | ------------------------------------------------- | ------- | ------ | -------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `useUploadAvatar`   | `features/upload-avatar/model/useUploadAvatar.ts` | хук     | ✅     | Оркестратор upload         | `uploadAvatarFile` → `updateProfile` → `setQueryData`      | `UploadAvatar`         |
-| `useRemoveAvatar`   | `features/remove-avatar/model/useRemoveAvatar.ts` | хук     | ✅     | Оркестратор remove         | `removeAvatarFile` → `updateProfile({ avatar_url: null })` | `RemoveAvatar`         |
-| `UploadAvatar`      | `features/upload-avatar/ui/UploadAvatar.tsx`      | UI      | ✅     | file input, Zod, mutation  | `useUploadAvatar`, `fileSchema`, `useIsMutating`           | `ProfileWidget` (слот) |
-| `RemoveAvatar`      | `features/remove-avatar/ui/RemoveAvatar.tsx`      | UI      | ✅     | Кнопка удаления            | `useRemoveAvatar`, `useIsMutating`                         | `ProfileWidget` (слот) |
-| `fileSchema`        | `features/upload-avatar/model/validation.ts`      | Zod     | ✅     | Файл: image, ≤5MB          | —                                                          | `UploadAvatar`         |
-| `edit-profile-name` | —                                                 | feature | 📋     | Редактирование `full_name` | `updateProfile`                                            | ROADMAP `nameSlot`     |
-| `change-email`      | —                                                 | feature | 📋     | Смена email через Auth     | `supabase.auth.updateUser`                                 | ROADMAP                |
-| `useProjects`       | —                                                 | хук     | 📋     | Список проектов            | `getProjectsByOwnerId`                                     | ROADMAP                |
+| Имя               | Файл                                              | Тип     | Статус | Назначение                | Вызывает                                                   | Кто использует         |
+| ----------------- | ------------------------------------------------- | ------- | ------ | ------------------------- | ---------------------------------------------------------- | ---------------------- |
+| `useUploadAvatar` | `features/upload-avatar/model/useUploadAvatar.ts` | хук     | ✅     | Оркестратор upload        | `uploadAvatarFile` → `updateProfile` → `setQueryData`      | `UploadAvatar`         |
+| `useRemoveAvatar` | `features/remove-avatar/model/useRemoveAvatar.ts` | хук     | ✅     | Оркестратор remove        | `removeAvatarFile` → `updateProfile({ avatar_url: null })` | `RemoveAvatar`         |
+| `UploadAvatar`    | `features/upload-avatar/ui/UploadAvatar.tsx`      | UI      | ✅     | file input, Zod, mutation | `useUploadAvatar`, `fileSchema`, `useIsMutating`           | `ProfileWidget` (слот) |
+| `RemoveAvatar`    | `features/remove-avatar/ui/RemoveAvatar.tsx`      | UI      | ✅     | Кнопка удаления           | `useRemoveAvatar`, `useIsMutating`                         | `ProfileWidget` (слот) |
+| `fileSchema`      | `features/upload-avatar/model/validation.ts`      | Zod     | ✅     | Файл: image, ≤5MB         | —                                                          | `UploadAvatar`         |
+| `useUpdateName`   | `features/update-name/model/useUpdateName.ts`     | хук     | ✅     | Оркестратор rename        | `updateProfile({ full_name })` → `setQueryData`            | `UpdateName`           |
+| `UpdateName`      | `features/update-name/ui/UpdateName.tsx`          | UI      | ✅     | input, Enter, Zod, blur   | `nameSchema`, `useUpdateName`                              | `ProfileWidget` (слот) |
+| `nameSchema`      | `features/update-name/model/validation.ts`        | Zod     | ✅     | Имя: 2–20 символов, буквы | —                                                          | `UpdateName`           |
+| `change-email`    | —                                                 | feature | 📋     | Смена email через Auth    | `supabase.auth.updateUser`                                 | ROADMAP                |
+| `useProjects`     | —                                                 | хук     | 📋     | Список проектов           | `getProjectsByOwnerId`                                     | ROADMAP                |
 
 ### 3.3 Widgets + pages — профиль
 
-| Имя             | Файл                                | Слой    | Статус | Назначение                          | Вызывает                                     | Кто использует |
-| --------------- | ----------------------------------- | ------- | ------ | ----------------------------------- | -------------------------------------------- | -------------- |
-| `ProfileWidget` | `widgets/profile/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar` | `ProfilePage`  |
-| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`    | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                   | `AppLayout`    |
-| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`  | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                   | `router`       |
+| Имя             | Файл                                | Слой    | Статус | Назначение                          | Вызывает                                                   | Кто использует |
+| --------------- | ----------------------------------- | ------- | ------ | ----------------------------------- | ---------------------------------------------------------- | -------------- |
+| `ProfileWidget` | `widgets/profile/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar`, `UpdateName` | `ProfilePage`  |
+| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`    | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                 | `AppLayout`    |
+| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`  | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                 | `router`       |
 
 ---
 
@@ -212,6 +215,17 @@ ProfileWidget / Sidebar
       → mapProfileRowToProfile (+ email из useAuth)
 ```
 
+### Update имени
+
+```
+UpdateName
+  → nameSchema (Zod)
+  → useUpdateName.mutate(full_name)
+      → updateProfile → updateProfileByUserId (withRetry)
+      → onSuccess: setQueryData(profileKeys.detail)
+  → blur input; UserAvatar / Sidebar ← useProfile (тот же cache)
+```
+
 ### Вход и сессия
 
 ```
@@ -229,6 +243,7 @@ AuthProvider.refreshAuth
 
 ## Changelog registry
 
+- **2026-05-29:** `features/update-name` (блок 2): `useUpdateName`, `UpdateName`, `nameSchema`; ROADMAP — фокус блок 3
 - **2026-05-29:** `withRetry` на profile API (`getProfileByUserId`, `updateProfileByUserId`)
 - **2026-05-29:** `withRetry` на auth API (`getSession`, sign-in/up/out, `getCurrentUser`); ROADMAP — блок 1 готов, фокус блок 2
 - **2026-05-30:** первый `REGISTRY.md`; avatar Storage, `withRetry`, `isNetworkError`; синхронизация с Canvas

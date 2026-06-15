@@ -4,7 +4,7 @@
 
 **Карта модулей:** [REGISTRY.md](./REGISTRY.md) · интерактивно: `canvases/kanban-app-registry.canvas.tsx`
 
-**Текущий фокус:** **блок 2** — `edit-profile-name` → слот `nameSlot` в `ProfileCard`. Блок 1 (аватар) и retry auth API — готовы.
+**Текущий фокус:** **блок 3** — `change-email`, `change-password` (модалки, Auth API). Блоки 1–2 (аватар, имя) и retry auth/profile API — готовы.
 
 ---
 
@@ -14,8 +14,8 @@
 2. [x] **Блок 1 (UI):** `UserAvatar`, `ProfileCard` со слотами, `Sidebar`
 3. [x] **Инфра mutation:** `updateProfileByUserId`, `updateProfile`, `setQueryData`
 4. [x] **Блок 1 (фичи):** upload/remove аватара (Storage + `profiles.avatar_url`) + `avatarActions`
-5. **Блок 2 — имя:** `edit-profile-name` → слот `nameSlot` ← **сейчас**
-6. **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`)
+5. [x] **Блок 2 — имя:** `update-name` → слот `nameSlot`
+6. **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`) ← **сейчас**
 7. Список projects на `/profile` + `useProjects`
 8. «Создать проект», `project/:id`, канбан
 
@@ -27,9 +27,9 @@
 
 | Слой               | Роль                                                                                                                                                            |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shared/ui`        | **`UserAvatar`** — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                         |
-| `entities/profile` | `Profile`, `useProfile`, `updateProfile`, **`ProfileCard`** — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
-| `features/*`       | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                        |
+| `shared/ui`        | `**UserAvatar`\*\* — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                       |
+| `entities/profile` | `Profile`, `useProfile`, `updateProfile`, `**ProfileCard**` — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
+| `features/`\*      | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                        |
 | `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                    |
 | `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                |
 
@@ -45,7 +45,7 @@
         <RemoveAvatar />
       </>
     ),
-    nameSlot: <EditProfileName fullName={profile.fullName} userId={profile.id} />,
+    nameSlot: <UpdateName name={profile.fullName ?? ''} />,
     emailActions: <ChangeEmail currentEmail={profile.email} />,
     passwordActions: <ChangePassword />,
   }}
@@ -63,7 +63,7 @@ ProfileCard
 │     ├── [shared] UserAvatar   ← src, name из profile
 │     └── {avatarActions}       ← features: upload-avatar, remove-avatar
 ├── Блок 2 — имя
-│     └── {nameSlot}          ← feature: edit-profile-name
+│     └── {nameSlot}          ← feature: update-name
 └── Блок 3 — учётные данные
       ├── [entity] Email: {profile.email}  (только показ)
       ├── {emailActions}      ← feature: change-email (+ модалка)
@@ -95,11 +95,11 @@ ProfileCard
 - [x] Компонент: есть `src` → `<img>`; нет фото, есть `name` → инициалы; иначе → пустой круг
 - [x] Не рендерить `<img>` с пустым `src`
 - [x] Пропсы без привязки к `Profile`: `src?`, `name?`, `size?` (для sidebar — меньший размер)
-- [x] Переиспользование: **`ProfileCard`** и **`Sidebar`**
+- [x] Переиспользование: `**ProfileCard`** и `**Sidebar\*\*`
 
 **Entity (`ProfileCard`):**
 
-- [x] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот **`userAvatar` не нужен**)
+- [x] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот `**userAvatar` не нужен\*\*)
 - [x] Объект `slots` для фич; без кнопок upload/remove и без inline-`<img>` в entity
 
 **Features** (после **инфраструктуры mutation**):
@@ -111,7 +111,7 @@ ProfileCard
 
 **Виджеты:**
 
-- [x] `ProfileWidget`: `slots.avatarActions` — `UploadAvatar`, `RemoveAvatar`; `nameSlot` / email / password — заглушки `null` до блоков 2–3
+- [x] `ProfileWidget`: `slots.avatarActions` — `UploadAvatar`, `RemoveAvatar`; `nameSlot` — `UpdateName`; email / password — заглушки `null` до блока 3
 - [x] `Sidebar`: `<UserAvatar />` из `useProfile` / кеша, без upload/remove
 
 ---
@@ -120,12 +120,14 @@ ProfileCard
 
 **Feature:**
 
-- [ ] `features/edit-profile-name` — показ текста → клик → `input` → blur/Enter → `mutate({ fullName })`, Zod
-- [ ] Плейсхолдер только в UI, **не** в `value` инпута
+- [x] `features/update-name` — `UpdateName`: input, Enter → Zod (`nameSchema`) → `useUpdateName` → `updateProfile({ full_name })` → `setQueryData`
+- [x] `useUpdateName` — оркестратор (как аватар); `userId` из `useAuth`
+- [x] Синхронизация пропа `name` → локальный стейт (`useEffect`); blur после успешного save
+- [x] Без success-текста в UI (тихий успех); ошибки валидации и сервера под полем
 
 **Виджет:**
 
-- [ ] `slots.nameSlot={<EditProfileName ... />}`
+- [x] `slots.nameSlot={<UpdateName name={profile.fullName ?? ''} />}`
 
 ---
 
@@ -237,6 +239,7 @@ ProfilePage
 - [x] `useProfile` (TanStack Query + `enabled` под auth), `profileKeys`, `updateProfile`
 - [x] Email в UI из сессии, не из таблицы `profiles`
 - [x] **Блок 1 — аватар:** Storage + `avatar_url`, `upload-avatar` / `remove-avatar`, слот `avatarActions`
+- [x] **Блок 2 — имя:** `update-name`, `useUpdateName`, слот `nameSlot`
 
 ### TanStack Query
 
