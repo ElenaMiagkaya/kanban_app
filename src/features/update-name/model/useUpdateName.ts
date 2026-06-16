@@ -1,8 +1,8 @@
 import { updateProfile } from '@entities/profile'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@shared/lib/auth/session'
-import type { Profile } from '@entities/profile/model/types'
-import { profileKeys } from '@entities/profile/api/profileKeys'
+import type { Profile } from '@entities/profile'
+import { profileKeys } from '@entities/profile'
 import type { NameSchema } from './validation'
 
 export const useUpdateName = () => {

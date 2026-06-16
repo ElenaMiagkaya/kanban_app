@@ -4,7 +4,7 @@
 
 **Карта модулей:** [REGISTRY.md](./REGISTRY.md) · интерактивно: `canvases/kanban-app-registry.canvas.tsx`
 
-**Текущий фокус:** **блок 3** — `change-email`, `change-password` (модалки, Auth API). Блоки 1–2 (аватар, имя) и retry auth/profile API — готовы.
+**Текущий фокус:** **блок 3** — `change-password` (модалка, Auth API). `change-email` готов, блоки 1–2 (аватар, имя) и retry auth/profile API — готовы.
 
 ---
 
@@ -15,7 +15,7 @@
 3. [x] **Инфра mutation:** `updateProfileByUserId`, `updateProfile`, `setQueryData`
 4. [x] **Блок 1 (фичи):** upload/remove аватара (Storage + `profiles.avatar_url`) + `avatarActions`
 5. [x] **Блок 2 — имя:** `update-name` → слот `nameSlot`
-6. **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`) ← **сейчас**
+6. **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`) ← **в работе (`change-password`)**
 7. Список projects на `/profile` + `useProjects`
 8. «Создать проект», `project/:id`, канбан
 
@@ -135,14 +135,14 @@ ProfileCard
 
 **Features (каждая со своей модалкой или внутри feature):**
 
-- [ ] `shared/ui`: `Modal` (или аналог)
-- [ ] `features/change-email` — `supabase.auth.updateUser({ email })`, учёт подтверждения почты
+- [x] `shared/ui`: `Modal` (или аналог)
+- [x] `features/change-email` — `supabase.auth.updateUser({ email })`, reauth через пароль, учёт подтверждения почты
 - [ ] `features/change-password` — `updateUser({ password })`, Zod
 
 **Entity / виджет:**
 
 - [ ] Email только текст в `ProfileCard`
-- [ ] `slots.emailActions`, `slots.passwordActions` — features
+- [ ] `slots.emailActions`, `slots.passwordActions` — features (`emailActions` готов, `passwordActions` pending)
 
 ---
 

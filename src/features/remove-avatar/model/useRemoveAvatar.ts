@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { removeAvatarFile } from '@shared/api/storage'
 import { useAuth } from '@shared/lib/auth/session'
 import { profileKeys } from '@entities/profile'
-import type { Profile } from '@entities/profile/model/types'
+import type { Profile } from '@entities/profile'
 import { updateProfile } from '@entities/profile'
 
 export const useRemoveAvatar = () => {

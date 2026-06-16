@@ -2,6 +2,7 @@ import { useProfile, ProfileCard } from '@entities/profile'
 import { UploadAvatar } from '@features/upload-avatar'
 import { RemoveAvatar } from '@features/remove-avatar'
 import { UpdateName } from '@features/update-name'
+import { ChangeEmail } from '@features/change-email'
 
 const ProfileWidget = () => {
   const { user, isLoading, data: profile, isPending, isError } = useProfile()
@@ -23,7 +24,7 @@ const ProfileWidget = () => {
           </>
         ),
         nameSlot: <UpdateName name={profile.fullName ? profile.fullName : ''} />,
-        emailActions: null,
+        emailActions: <ChangeEmail UserEmail={profile.email} />,
         passwordActions: null,
       }}
     />

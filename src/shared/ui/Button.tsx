@@ -9,6 +9,7 @@ interface ButtonProps {
   fontSize?: string
   disabled?: boolean
   padding?: string
+  type?: 'button' | 'submit' | 'reset'
   children: React.ReactNode
 }
 
@@ -24,9 +25,11 @@ const Button = ({
   padding = '0',
   disabled = false,
   children,
+  type = 'button',
 }: ButtonProps) => {
   return (
     <button
+      type={type}
       onClick={onClick}
       style={{ width, height, backgroundColor, color, borderRadius, border, fontSize, padding }}
       disabled={disabled}

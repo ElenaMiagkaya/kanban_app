@@ -58,6 +58,7 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `signOut`               | `shared/api/auth/signOut.ts`                  | API    | ✅     | Выход, сброс сессии                   | `withRetry` → `supabase.auth.signOut`            | `AuthProvider.handleSignOut` |
 | `getSession`            | `shared/api/auth/getSession.ts`               | API    | ✅     | Текущая сессия                        | `withRetry` → `supabase.auth.getSession`         | `AuthProvider.refreshAuth`   |
 | `getCurrentUser`        | `shared/api/auth/getCurrentUser.ts`           | API    | ✅     | User с проверкой JWT на сервере       | `withRetry` → `supabase.auth.getUser`            | резерв                       |
+| `updateAuthUser`        | `shared/api/auth/updateAuthUser.ts`           | API    | ✅     | UPDATE email/password в Auth          | `withRetry` → `supabase.auth.updateUser`         | `useChangeEmail`             |
 | `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                 |
 | `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`              |
 | `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`            |
@@ -77,11 +78,12 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 1.3 UI + config — `shared/ui`, `shared/config`
 
-| Имя          | Файл                       | Тип    | Статус | Назначение                    | Вызывает      | Кто использует                 |
-| ------------ | -------------------------- | ------ | ------ | ----------------------------- | ------------- | ------------------------------ |
-| `Button`     | `shared/ui/Button.tsx`     | UI     | ✅     | Кнопка                        | —             | `UploadAvatar`, `RemoveAvatar` |
-| `UserAvatar` | `shared/ui/UserAvatar.tsx` | UI     | ✅     | Круг: фото / инициалы / пусто | `getInitials` | `ProfileCard`, `Sidebar`       |
-| `ROUTES`     | `shared/config/routes.ts`  | config | ✅     | Пути маршрутов                | —             | `router`, guards, features     |
+| Имя          | Файл                        | Тип    | Статус | Назначение                    | Вызывает      | Кто использует                                |
+| ------------ | --------------------------- | ------ | ------ | ----------------------------- | ------------- | --------------------------------------------- |
+| `Button`     | `shared/ui/Button.tsx`      | UI     | ✅     | Кнопка                        | —             | `UploadAvatar`, `RemoveAvatar`, `ChangeEmail` |
+| `UserAvatar` | `shared/ui/UserAvatar.tsx`  | UI     | ✅     | Круг: фото / инициалы / пусто | `getInitials` | `ProfileCard`, `Sidebar`                      |
+| `Modal`      | `shared/ui/modal/modal.tsx` | UI     | ✅     | Обёртка модального окна       | —             | `ChangeEmail`                                 |
+| `ROUTES`     | `shared/config/routes.ts`   | config | ✅     | Пути маршрутов                | —             | `router`, guards, features                    |
 
 ---
 
@@ -139,28 +141,30 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `useProfile`             | `entities/profile/api/useProfile.ts`               | хук        | ✅     | Query профиля                         | `useAuth`, `getProfile`, `profileKeys`         | `ProfileWidget`, `Sidebar`                            |
 | `ProfileCard`            | `entities/profile/ui/ProfileCard.tsx`              | UI         | ✅     | Layout профиля + слоты                | `UserAvatar`                                   | `ProfileWidget`                                       |
 
-### 3.2 Features — профиль (аватар, имя)
+### 3.2 Features — профиль (аватар, имя, email)
 
-| Имя               | Файл                                              | Тип     | Статус | Назначение                | Вызывает                                                   | Кто использует         |
-| ----------------- | ------------------------------------------------- | ------- | ------ | ------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `useUploadAvatar` | `features/upload-avatar/model/useUploadAvatar.ts` | хук     | ✅     | Оркестратор upload        | `uploadAvatarFile` → `updateProfile` → `setQueryData`      | `UploadAvatar`         |
-| `useRemoveAvatar` | `features/remove-avatar/model/useRemoveAvatar.ts` | хук     | ✅     | Оркестратор remove        | `removeAvatarFile` → `updateProfile({ avatar_url: null })` | `RemoveAvatar`         |
-| `UploadAvatar`    | `features/upload-avatar/ui/UploadAvatar.tsx`      | UI      | ✅     | file input, Zod, mutation | `useUploadAvatar`, `fileSchema`, `useIsMutating`           | `ProfileWidget` (слот) |
-| `RemoveAvatar`    | `features/remove-avatar/ui/RemoveAvatar.tsx`      | UI      | ✅     | Кнопка удаления           | `useRemoveAvatar`, `useIsMutating`                         | `ProfileWidget` (слот) |
-| `fileSchema`      | `features/upload-avatar/model/validation.ts`      | Zod     | ✅     | Файл: image, ≤5MB         | —                                                          | `UploadAvatar`         |
-| `useUpdateName`   | `features/update-name/model/useUpdateName.ts`     | хук     | ✅     | Оркестратор rename        | `updateProfile({ full_name })` → `setQueryData`            | `UpdateName`           |
-| `UpdateName`      | `features/update-name/ui/UpdateName.tsx`          | UI      | ✅     | input, Enter, Zod, blur   | `nameSchema`, `useUpdateName`                              | `ProfileWidget` (слот) |
-| `nameSchema`      | `features/update-name/model/validation.ts`        | Zod     | ✅     | Имя: 2–20 символов, буквы | —                                                          | `UpdateName`           |
-| `change-email`    | —                                                 | feature | 📋     | Смена email через Auth    | `supabase.auth.updateUser`                                 | ROADMAP                |
-| `useProjects`     | —                                                 | хук     | 📋     | Список проектов           | `getProjectsByOwnerId`                                     | ROADMAP                |
+| Имя                 | Файл                                              | Тип | Статус | Назначение                | Вызывает                                                   | Кто использует         |
+| ------------------- | ------------------------------------------------- | --- | ------ | ------------------------- | ---------------------------------------------------------- | ---------------------- |
+| `useUploadAvatar`   | `features/upload-avatar/model/useUploadAvatar.ts` | хук | ✅     | Оркестратор upload        | `uploadAvatarFile` → `updateProfile` → `setQueryData`      | `UploadAvatar`         |
+| `useRemoveAvatar`   | `features/remove-avatar/model/useRemoveAvatar.ts` | хук | ✅     | Оркестратор remove        | `removeAvatarFile` → `updateProfile({ avatar_url: null })` | `RemoveAvatar`         |
+| `UploadAvatar`      | `features/upload-avatar/ui/UploadAvatar.tsx`      | UI  | ✅     | file input, Zod, mutation | `useUploadAvatar`, `fileSchema`, `useIsMutating`           | `ProfileWidget` (слот) |
+| `RemoveAvatar`      | `features/remove-avatar/ui/RemoveAvatar.tsx`      | UI  | ✅     | Кнопка удаления           | `useRemoveAvatar`, `useIsMutating`                         | `ProfileWidget` (слот) |
+| `fileSchema`        | `features/upload-avatar/model/validation.ts`      | Zod | ✅     | Файл: image, ≤5MB         | —                                                          | `UploadAvatar`         |
+| `useUpdateName`     | `features/update-name/model/useUpdateName.ts`     | хук | ✅     | Оркестратор rename        | `updateProfile({ full_name })` → `setQueryData`            | `UpdateName`           |
+| `UpdateName`        | `features/update-name/ui/UpdateName.tsx`          | UI  | ✅     | input, Enter, Zod, blur   | `nameSchema`, `useUpdateName`                              | `ProfileWidget` (слот) |
+| `nameSchema`        | `features/update-name/model/validation.ts`        | Zod | ✅     | Имя: 2–20 символов, буквы | —                                                          | `UpdateName`           |
+| `useChangeEmail`    | `features/change-email/model/useChangeEmail.ts`   | хук | ✅     | Reauth + смена email      | `signInWithEmail` → `updateAuthUser`                       | `ChangeEmail`          |
+| `changeEmailSchema` | `features/change-email/model/validation.ts`       | Zod | ✅     | Новый email + пароль      | —                                                          | `ChangeEmail`          |
+| `ChangeEmail`       | `features/change-email/ui/ChangeEmail.tsx`        | UI  | ✅     | Модалка смены email       | `Modal`, `Button`, `useChangeEmail`, `changeEmailSchema`   | `ProfileWidget` (слот) |
+| `useProjects`       | —                                                 | хук | 📋     | Список проектов           | `getProjectsByOwnerId`                                     | ROADMAP                |
 
 ### 3.3 Widgets + pages — профиль
 
-| Имя             | Файл                                | Слой    | Статус | Назначение                          | Вызывает                                                   | Кто использует |
-| --------------- | ----------------------------------- | ------- | ------ | ----------------------------------- | ---------------------------------------------------------- | -------------- |
-| `ProfileWidget` | `widgets/profile/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar`, `UpdateName` | `ProfilePage`  |
-| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`    | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                 | `AppLayout`    |
-| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`  | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                 | `router`       |
+| Имя             | Файл                                | Слой    | Статус | Назначение                          | Вызывает                                                                  | Кто использует |
+| --------------- | ----------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------------------------------- | -------------- |
+| `ProfileWidget` | `widgets/profile/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar`, `UpdateName`, `ChangeEmail` | `ProfilePage`  |
+| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`    | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                                | `AppLayout`    |
+| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`  | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                                | `router`       |
 
 ---
 
@@ -239,10 +243,22 @@ AuthProvider.refreshAuth
   → getSession (withRetry) → session | null (гость без throw)
 ```
 
+### Смена email
+
+```
+ChangeEmail
+  → changeEmailSchema (Zod: newEmail + password)
+  → useChangeEmail.mutate({ newEmail, password })
+      → signInWithEmail(currentEmail, password)
+      → updateAuthUser({ email: newEmail }) (withRetry)
+  → success: сообщение о подтверждении почты
+```
+
 ---
 
 ## Changelog registry
 
+- **2026-06-16:** `features/change-email` + `shared/ui/Modal` + `shared/api/auth/updateAuthUser`; слот `emailActions` в `ProfileWidget`
 - **2026-05-29:** `features/update-name` (блок 2): `useUpdateName`, `UpdateName`, `nameSchema`; ROADMAP — фокус блок 3
 - **2026-05-29:** `withRetry` на profile API (`getProfileByUserId`, `updateProfileByUserId`)
 - **2026-05-29:** `withRetry` на auth API (`getSession`, sign-in/up/out, `getCurrentUser`); ROADMAP — блок 1 готов, фокус блок 2

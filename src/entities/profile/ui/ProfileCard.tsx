@@ -25,7 +25,7 @@ const ProfileCard = ({ profile, slots }: ProfileCardProps) => {
       </div>
       <div style={{ display: 'flex', gap: '10px' }}>{slots.nameSlot}</div>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <p>Email: {profile.email || 'Добавьте email'}</p>
+        <p>{profile.email} </p>
         {slots.emailActions}
       </div>
       {slots.passwordActions}

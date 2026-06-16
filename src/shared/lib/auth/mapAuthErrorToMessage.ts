@@ -32,6 +32,16 @@ export const mapAuthErrorToMessage = (error: unknown): string => {
       case maybeMessage?.includes('invalid token'):
         return 'Не удалось выйти. Обновите страницу и попробуйте снова'
       //ошибки другие
+      case maybeMessage?.includes('invalid email'):
+        return 'Неверный email'
+      case maybeMessage?.includes('invalid password'):
+        return 'Неверный пароль'
+      case maybeMessage?.includes('invalid token'):
+        return 'Неверный токен'
+      case maybeMessage?.includes('invalid credentials'):
+        return 'Неверный email или пароль'
+      case maybeMessage?.includes('invalid user'):
+        return 'Неверный пользователь'
       default:
         return 'Не удалось выполнить операцию. Попробуйте еще раз'
     }
