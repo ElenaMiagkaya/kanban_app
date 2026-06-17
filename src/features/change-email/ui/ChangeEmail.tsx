@@ -18,11 +18,10 @@ const ChangeEmail = ({ UserEmail }: { UserEmail: string }) => {
   } = useChangeEmail(UserEmail)
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-
     setErrorValidation(null) //сбросить ошибку валидации
     reset() //сбросить ошибку прошлой мутации
     e.preventDefault() //предотвратить стандартное поведение формы
-    
+
     const formData = new FormData(e.target) //собираем данные из формы в переменную formData
     const newEmail = formData.get('newEmail') as string //получаем значение из поля newEmail
     const password = formData.get('password') as string //получаем значение из поля password
