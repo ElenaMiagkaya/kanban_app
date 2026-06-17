@@ -51,12 +51,13 @@ const ChangeEmail = ({ UserEmail }: { UserEmail: string }) => {
 
   return (
     <div>
-      <button onClick={handleOpen}>Изменить</button>
+      {!isOpen ? <button onClick={handleOpen}>Изменить email</button> : null}
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Изменить email"
         description={isSuccess ? null : `Ваш текущий email: ${UserEmail}`}
+        isCloseDisabled={isPending}
       >
         {/* если email успешно изменен, выводим сообщение о том, что мы отправили письмо для подтверждения */}
         {isSuccess ? (

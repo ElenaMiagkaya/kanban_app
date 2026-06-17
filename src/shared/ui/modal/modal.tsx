@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 
 interface ModalProps {
   isOpen: boolean
+  isCloseDisabled?: boolean //для блокировки закрытия модалки,пока идет мутация
   onClose: () => void
   title: string
   children: React.ReactNode
   description?: string | null //описание модального окна
 }
 
-const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) => {
+const Modal = ({ isOpen, onClose, title, children, description, isCloseDisabled }: ModalProps) => {
   useEffect(() => {
     if (!isOpen) return //если модальное окно не открыто, не выполняем эффект
 
@@ -17,7 +18,7 @@ const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) =>
 
     const handleKeyDown = (e: KeyboardEvent) => {
       //обработчик нажатия клавиши Escape
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !isCloseDisabled) {
         onClose()
       }
     }
@@ -26,7 +27,7 @@ const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) =>
       document.removeEventListener('keydown', handleKeyDown) //отписываемся от события нажатия клавиши Escape
       document.body.style.overflow = currentOverflow //возвращаем overflow body в текущее значение
     }
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, isCloseDisabled])
 
   if (!isOpen) return null //если модальное окно не открыто
 
@@ -41,7 +42,7 @@ const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) =>
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 1000,
       }}
-      onClick={onClose}
+      onClick={isCloseDisabled ? undefined : onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -62,9 +63,10 @@ const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) =>
         <h1 id="modal-title">{title}</h1>
         {description && <p>{description}</p>}
         <button
-          onClick={onClose}
+          onClick={isCloseDisabled ? undefined : onClose}
           aria-label="Закрыть модальное окно"
           style={{ position: 'absolute', top: 10, right: 10 }}
+          disabled={isCloseDisabled}
         >
           Закрыть
         </button>

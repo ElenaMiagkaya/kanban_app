@@ -49,6 +49,7 @@ const ChangePassword = ({ userEmail }: { userEmail: string }) => {
         onClose={() => setIsOpen(false)}
         title="Изменить пароль"
         description={description}
+        isCloseDisabled={isPending}
       >
         <form onSubmit={handleSubmit}>
           <input
