@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { useAuth } from '@/shared/lib/auth/session'
+import { useAuth, mapAuthErrorToMessage } from '@/shared/lib'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@shared/config'
-import { mapAuthErrorToMessage } from '@/shared/lib'
 
 const SignOut = () => {
   const navigate = useNavigate()

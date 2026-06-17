@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { removeAvatarFile } from '@shared/api/storage'
-import { useAuth } from '@shared/lib/auth/session'
-import { profileKeys } from '@entities/profile'
-import type { Profile } from '@entities/profile'
-import { updateProfile } from '@entities/profile'
+import { removeAvatarFile } from '@shared/api'
+import { useAuth } from '@shared/lib'
+import { updateProfile, type Profile, profileKeys } from '@entities/profile'
 
 export const useRemoveAvatar = () => {
   const queryClient = useQueryClient() //хук, который берет queryClient из контекста выше

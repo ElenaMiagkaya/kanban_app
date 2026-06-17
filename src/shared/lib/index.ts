@@ -1,3 +1,7 @@
 export { mapAuthErrorToMessage } from './auth/mapAuthErrorToMessage'
 export { isNetworkError } from './network/isNetworkError'
 export { withRetry } from './retry/withRetry'
+export { AuthContext } from './auth/session/AuthContext'
+export type { AuthContextType } from './auth/session/AuthContextType'
+export { useAuth } from './auth/session/useAuth'
+export {}

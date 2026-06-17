@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getSession, signOut, supabase } from '@/shared/api'
-import type { AuthContextType } from '@/shared/lib/auth/session'
-import { AuthContext } from '@/shared/lib/auth/session'
+import { AuthContext, type AuthContextType } from '@/shared/lib'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true)

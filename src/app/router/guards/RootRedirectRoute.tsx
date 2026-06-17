@@ -1,4 +1,4 @@
-import { useAuth } from '@/shared/lib/auth/session'
+import { useAuth } from '@shared/lib'
 import { Navigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/config'
 

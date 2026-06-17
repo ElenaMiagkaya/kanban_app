@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateProfile } from '@entities/profile'
-import { useAuth } from '@shared/lib/auth/session'
-import { profileKeys } from '@entities/profile'
-import { uploadAvatarFile } from '@shared/api/storage'
-import type { Profile } from '@entities/profile'
+import { updateProfile, profileKeys, type Profile } from '@entities/profile'
+import { useAuth } from '@shared/lib'
+import { uploadAvatarFile } from '@shared/api'
 
 export const useUploadAvatar = () => {
   const queryClient = useQueryClient() //хук, который берет queryClient из контекста выше

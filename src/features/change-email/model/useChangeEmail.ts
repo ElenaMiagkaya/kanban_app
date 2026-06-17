@@ -1,5 +1,4 @@
-import { signInWithEmail } from '@shared/api/auth/signInWithEmail'
-import { updateAuthUser } from '@shared/api/auth/updateAuthUser'
+import { signInWithEmail, updateAuthUser } from '@shared/api'
 import { useMutation } from '@tanstack/react-query'
 
 export const useChangeEmail = (currentEmail: string) => {

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getProfile } from './getProfile'
-import { useAuth } from '@shared/lib/auth/session'
+import { useAuth } from '@shared/lib'
 import { profileKeys } from './profileKeys'
 import type { Profile } from '../model/types'
 
