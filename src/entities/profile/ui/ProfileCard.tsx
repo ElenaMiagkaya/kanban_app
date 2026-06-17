@@ -17,7 +17,7 @@ interface ProfileCardProps {
 
 const ProfileCard = ({ profile, slots }: ProfileCardProps) => {
   return (
-    <article style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <article style={{ display: 'flex', flexDirection: 'column', gap: '10px',textAlign: 'left'}}>
       <h1>Профиль</h1>
       <div style={{ display: 'flex', gap: '10px' }}>
         <UserAvatar src={profile.avatarUrl} name={profile.fullName} size={100} />
