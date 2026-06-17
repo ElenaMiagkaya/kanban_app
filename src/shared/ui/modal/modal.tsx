@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -7,13 +9,67 @@ interface ModalProps {
 }
 
 const Modal = ({ isOpen, onClose, title, children, description }: ModalProps) => {
-  if (!isOpen) return null
+  useEffect(() => {
+    if (!isOpen) return //если модальное окно не открыто, не выполняем эффект
+
+    const currentOverflow = document.body.style.overflow //сохраняем текущее значение overflow body, чтобы потом вернуть его
+    document.body.style.overflow = 'hidden' //устанавливаем overflow body в hidden, чтобы не было прокрутки при открытом модальном окне
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      //обработчик нажатия клавиши Escape
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown) //подписываемся на событие нажатия клавиши Escape
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown) //отписываемся от события нажатия клавиши Escape
+      document.body.style.overflow = currentOverflow //возвращаем overflow body в текущее значение
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null //если модальное окно не открыто
+
   return (
-    <div>
-      <h1>{title}</h1>
-      <p>{description}</p>
-      <button onClick={onClose}>Закрыть</button>
-      {children}
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 1000,
+      }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div
+        style={{
+          position: 'relative',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'white',
+          padding: '30px',
+          borderRadius: '10px',
+          width: '500px',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h1 id="modal-title">{title}</h1>
+        {description && <p>{description}</p>}
+        <button
+          onClick={onClose}
+          aria-label="Закрыть модальное окно"
+          style={{ position: 'absolute', top: 10, right: 10 }}
+        >
+          Закрыть
+        </button>
+        {children}
+      </div>
     </div>
   )
 }
