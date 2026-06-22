@@ -1,10 +1,15 @@
 import type { Board } from '@entities/board'
 
-export type Project = {
+// тип для списка проектов
+export type ProjectListItem = {
   id: string
   title: string
-  description: string | null
   createdAt: string
+}
+
+// тип для проекта
+export type Project = ProjectListItem & {
+  description: string | null
   updatedAt: string
   boards: Board[]
 }

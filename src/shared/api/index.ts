@@ -13,3 +13,6 @@ export { updateAuthUser } from './auth/updateAuthUser'
 // функции для работы с storage
 export { uploadAvatarFile } from './storage/uploadAvatarFile'
 export { removeAvatarFile } from './storage/removeAvatarFile'
+
+// функции для работы с проектами
+export { getProjectsByOwnerId } from './projects/getProjectsByOwnerId'

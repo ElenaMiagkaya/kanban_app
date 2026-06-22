@@ -52,40 +52,40 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 1.1 API — `shared/api`
 
-| Имя                     | Файл                                          | Тип    | Статус | Назначение                            | Вызывает                                         | Кто использует               |
-| ----------------------- | --------------------------------------------- | ------ | ------ | ------------------------------------- | ------------------------------------------------ | ---------------------------- |
-| `supabase`              | `shared/api/supabase/client.ts`               | клиент | ✅     | Supabase JS client + типы БД          | `createClient`, env `VITE_*`                     | все API, `AuthProvider`      |
-| `signUpWithEmail`       | `shared/api/auth/signUpWithEmail.ts`          | API    | ✅     | Регистрация email/password            | `withRetry` → `supabase.auth.signUp`             | `SignUpByEmail`              |
+| Имя                     | Файл                                          | Тип    | Статус | Назначение                            | Вызывает                                         | Кто использует                                         |
+| ----------------------- | --------------------------------------------- | ------ | ------ | ------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| `supabase`              | `shared/api/supabase/client.ts`               | клиент | ✅     | Supabase JS client + типы БД          | `createClient`, env `VITE_*`                     | все API, `AuthProvider`                                |
+| `signUpWithEmail`       | `shared/api/auth/signUpWithEmail.ts`          | API    | ✅     | Регистрация email/password            | `withRetry` → `supabase.auth.signUp`             | `SignUpByEmail`                                        |
 | `signInWithEmail`       | `shared/api/auth/signInWithEmail.ts`          | API    | ✅     | Вход email/password                   | `withRetry` → `supabase.auth.signInWithPassword` | `SignInByEmail`, `useChangeEmail`, `useChangePassword` |
-| `signOut`               | `shared/api/auth/signOut.ts`                  | API    | ✅     | Выход, сброс сессии                   | `withRetry` → `supabase.auth.signOut`            | `AuthProvider.handleSignOut`, `useChangePassword` |
-| `getSession`            | `shared/api/auth/getSession.ts`               | API    | ✅     | Текущая сессия                        | `withRetry` → `supabase.auth.getSession`         | `AuthProvider.refreshAuth`   |
-| `getCurrentUser`        | `shared/api/auth/getCurrentUser.ts`           | API    | ✅     | User с проверкой JWT на сервере       | `withRetry` → `supabase.auth.getUser`            | резерв                       |
-| `updateAuthUser`        | `shared/api/auth/updateAuthUser.ts`           | API    | ✅     | UPDATE email/password в Auth          | `withRetry` → `supabase.auth.updateUser`         | `useChangeEmail`, `useChangePassword` |
-| `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                 |
-| `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`              |
-| `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`            |
-| `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`            |
+| `signOut`               | `shared/api/auth/signOut.ts`                  | API    | ✅     | Выход, сброс сессии                   | `withRetry` → `supabase.auth.signOut`            | `AuthProvider.handleSignOut`, `useChangePassword`      |
+| `getSession`            | `shared/api/auth/getSession.ts`               | API    | ✅     | Текущая сессия                        | `withRetry` → `supabase.auth.getSession`         | `AuthProvider.refreshAuth`                             |
+| `getCurrentUser`        | `shared/api/auth/getCurrentUser.ts`           | API    | ✅     | User с проверкой JWT на сервере       | `withRetry` → `supabase.auth.getUser`            | резерв                                                 |
+| `updateAuthUser`        | `shared/api/auth/updateAuthUser.ts`           | API    | ✅     | UPDATE email/password в Auth          | `withRetry` → `supabase.auth.updateUser`         | `useChangeEmail`, `useChangePassword`                  |
+| `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                                           |
+| `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`                                        |
+| `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`                                      |
+| `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`                                      |
 
 ### 1.2 Lib — `shared/lib`
 
-| Имя                     | Файл                                         | Тип     | Статус | Назначение                          | Вызывает                                         | Кто использует                                |
-| ----------------------- | -------------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------ | --------------------------------------------- |
-| `isNetworkError`        | `shared/lib/network/isNetworkError.ts`       | утилита | ✅     | Сетевая ли ошибка (retry + auth UI) | маркеры в `message`, `isAuthRetryableFetchError` | `withRetry`, `mapAuthErrorToMessage`          |
-| `withRetry`             | `shared/lib/retry/withRetry.ts`              | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, profile API, Storage API            |
+| Имя                     | Файл                                         | Тип     | Статус | Назначение                          | Вызывает                                         | Кто использует                                                               |
+| ----------------------- | -------------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `isNetworkError`        | `shared/lib/network/isNetworkError.ts`       | утилита | ✅     | Сетевая ли ошибка (retry + auth UI) | маркеры в `message`, `isAuthRetryableFetchError` | `withRetry`, `mapAuthErrorToMessage`                                         |
+| `withRetry`             | `shared/lib/retry/withRetry.ts`              | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, profile API, Storage API                                           |
 | `mapAuthErrorToMessage` | `shared/lib/auth/mapAuthErrorToMessage.ts`   | утилита | ✅     | Текст ошибки для auth UI            | `isNetworkError` + коды Supabase                 | `SignInByEmail`, `SignUpByEmail`, `SignOut`, `ChangeEmail`, `ChangePassword` |
-| `getInitials`           | `shared/lib/profile/getInitials.ts`          | утилита | ✅     | Инициалы из имени                   | —                                                | `UserAvatar`                                  |
-| `useAuth`               | `shared/lib/auth/session/useAuth.ts`         | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut` |
-| `AuthContext`           | `shared/lib/auth/session/AuthContext.ts`     | context | ✅     | React-контекст сессии               | —                                                | `AuthProvider`, `useAuth`                     |
-| `AuthContextType`       | `shared/lib/auth/session/AuthContextType.ts` | тип     | ✅     | `isAuth`, `user`, `signOut`, …      | —                                                | `AuthProvider`, `useAuth`                     |
+| `getInitials`           | `shared/lib/profile/getInitials.ts`          | утилита | ✅     | Инициалы из имени                   | —                                                | `UserAvatar`                                                                 |
+| `useAuth`               | `shared/lib/auth/session/useAuth.ts`         | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut`                                |
+| `AuthContext`           | `shared/lib/auth/session/AuthContext.ts`     | context | ✅     | React-контекст сессии               | —                                                | `AuthProvider`, `useAuth`                                                    |
+| `AuthContextType`       | `shared/lib/auth/session/AuthContextType.ts` | тип     | ✅     | `isAuth`, `user`, `signOut`, …      | —                                                | `AuthProvider`, `useAuth`                                                    |
 
 ### 1.3 UI + config — `shared/ui`, `shared/config`
 
-| Имя          | Файл                        | Тип    | Статус | Назначение                    | Вызывает      | Кто использует                                |
-| ------------ | --------------------------- | ------ | ------ | ----------------------------- | ------------- | --------------------------------------------- |
-| `Button`     | `shared/ui/Button.tsx`      | UI     | ✅     | Кнопка                        | —             | `UploadAvatar`, `RemoveAvatar`, `ChangeEmail`, `ChangePassword` |
-| `UserAvatar` | `shared/ui/UserAvatar.tsx`  | UI     | ✅     | Круг: фото / инициалы / пусто | `getInitials` | `ProfileCard`, `Sidebar`                      |
-| `Modal`      | `shared/ui/modal/modal.tsx` | UI     | ✅     | Модалка: overlay, Esc, scroll lock, `isCloseDisabled` | — | `ChangeEmail`, `ChangePassword` |
-| `ROUTES`     | `shared/config/routes.ts`   | config | ✅     | Пути маршрутов                | —             | `router`, guards, features                    |
+| Имя          | Файл                        | Тип    | Статус | Назначение                                            | Вызывает      | Кто использует                                                  |
+| ------------ | --------------------------- | ------ | ------ | ----------------------------------------------------- | ------------- | --------------------------------------------------------------- |
+| `Button`     | `shared/ui/Button.tsx`      | UI     | ✅     | Кнопка                                                | —             | `UploadAvatar`, `RemoveAvatar`, `ChangeEmail`, `ChangePassword` |
+| `UserAvatar` | `shared/ui/UserAvatar.tsx`  | UI     | ✅     | Круг: фото / инициалы / пусто                         | `getInitials` | `ProfileCard`, `Sidebar`                                        |
+| `Modal`      | `shared/ui/modal/modal.tsx` | UI     | ✅     | Модалка: overlay, Esc, scroll lock, `isCloseDisabled` | —             | `ChangeEmail`, `ChangePassword`                                 |
+| `ROUTES`     | `shared/config/routes.ts`   | config | ✅     | Пути маршрутов                                        | —             | `router`, guards, features                                      |
 
 ---
 
@@ -145,31 +145,31 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 3.2 Features — профиль (аватар, имя, email, password)
 
-| Имя                 | Файл                                              | Тип | Статус | Назначение                | Вызывает                                                   | Кто использует         |
-| ------------------- | ------------------------------------------------- | --- | ------ | ------------------------- | ---------------------------------------------------------- | ---------------------- |
-| `useUploadAvatar`   | `features/upload-avatar/model/useUploadAvatar.ts` | хук | ✅     | Оркестратор upload        | `uploadAvatarFile` → `updateProfile` → `setQueryData`      | `UploadAvatar`         |
-| `useRemoveAvatar`   | `features/remove-avatar/model/useRemoveAvatar.ts` | хук | ✅     | Оркестратор remove        | `removeAvatarFile` → `updateProfile({ avatar_url: null })` | `RemoveAvatar`         |
-| `UploadAvatar`      | `features/upload-avatar/ui/UploadAvatar.tsx`      | UI  | ✅     | file input, Zod, mutation | `useUploadAvatar`, `fileSchema`, `useIsMutating`           | `ProfileWidget` (слот) |
-| `RemoveAvatar`      | `features/remove-avatar/ui/RemoveAvatar.tsx`      | UI  | ✅     | Кнопка удаления           | `useRemoveAvatar`, `useIsMutating`                         | `ProfileWidget` (слот) |
-| `fileSchema`        | `features/upload-avatar/model/validation.ts`      | Zod | ✅     | Файл: image, ≤5MB         | —                                                          | `UploadAvatar`         |
-| `useUpdateName`     | `features/update-name/model/useUpdateName.ts`     | хук | ✅     | Оркестратор rename        | `updateProfile({ full_name })` → `setQueryData`            | `UpdateName`           |
-| `UpdateName`        | `features/update-name/ui/UpdateName.tsx`          | UI  | ✅     | input, Enter, Zod, blur   | `nameSchema`, `useUpdateName`                              | `ProfileWidget` (слот) |
-| `nameSchema`        | `features/update-name/model/validation.ts`        | Zod | ✅     | Имя: 2–20 символов, буквы | —                                                          | `UpdateName`           |
-| `useChangeEmail`    | `features/change-email/model/useChangeEmail.ts`   | хук | ✅     | Reauth + смена email      | `signInWithEmail` → `updateAuthUser`                       | `ChangeEmail`          |
-| `changeEmailSchema` | `features/change-email/model/validation.ts`       | Zod | ✅     | Новый email + пароль      | —                                                          | `ChangeEmail`          |
-| `ChangeEmail`       | `features/change-email/ui/ChangeEmail.tsx`        | UI  | ✅     | Модалка смены email       | `Modal`, `Button`, `useChangeEmail`, `changeEmailSchema`   | `ProfileWidget` (слот) |
-| `useChangePassword` | `features/change-password/model/useChangePassword.ts` | хук | ✅ | Reauth + смена пароля + signOut | `signInWithEmail` → `updateAuthUser` → `signOut` → navigate | `ChangePassword` |
-| `changePasswordSchema` | `features/change-password/model/validation.ts` | Zod | ✅ | new/confirm/current password | — | `ChangePassword` |
-| `ChangePassword`    | `features/change-password/ui/ChangePassword.tsx`  | UI  | ✅     | Модалка смены пароля      | `Modal`, `Button`, `useChangePassword`, `changePasswordSchema` | `ProfileWidget` (слот) |
-| `useProjects`       | —                                                 | хук | 📋     | Список проектов           | `getProjectsByOwnerId`                                     | ROADMAP                |
+| Имя                    | Файл                                                  | Тип | Статус | Назначение                      | Вызывает                                                       | Кто использует         |
+| ---------------------- | ----------------------------------------------------- | --- | ------ | ------------------------------- | -------------------------------------------------------------- | ---------------------- |
+| `useUploadAvatar`      | `features/upload-avatar/model/useUploadAvatar.ts`     | хук | ✅     | Оркестратор upload              | `uploadAvatarFile` → `updateProfile` → `setQueryData`          | `UploadAvatar`         |
+| `useRemoveAvatar`      | `features/remove-avatar/model/useRemoveAvatar.ts`     | хук | ✅     | Оркестратор remove              | `removeAvatarFile` → `updateProfile({ avatar_url: null })`     | `RemoveAvatar`         |
+| `UploadAvatar`         | `features/upload-avatar/ui/UploadAvatar.tsx`          | UI  | ✅     | file input, Zod, mutation       | `useUploadAvatar`, `fileSchema`, `useIsMutating`               | `ProfileWidget` (слот) |
+| `RemoveAvatar`         | `features/remove-avatar/ui/RemoveAvatar.tsx`          | UI  | ✅     | Кнопка удаления                 | `useRemoveAvatar`, `useIsMutating`                             | `ProfileWidget` (слот) |
+| `fileSchema`           | `features/upload-avatar/model/validation.ts`          | Zod | ✅     | Файл: image, ≤5MB               | —                                                              | `UploadAvatar`         |
+| `useUpdateName`        | `features/update-name/model/useUpdateName.ts`         | хук | ✅     | Оркестратор rename              | `updateProfile({ full_name })` → `setQueryData`                | `UpdateName`           |
+| `UpdateName`           | `features/update-name/ui/UpdateName.tsx`              | UI  | ✅     | input, Enter, Zod, blur         | `nameSchema`, `useUpdateName`                                  | `ProfileWidget` (слот) |
+| `nameSchema`           | `features/update-name/model/validation.ts`            | Zod | ✅     | Имя: 2–20 символов, буквы       | —                                                              | `UpdateName`           |
+| `useChangeEmail`       | `features/change-email/model/useChangeEmail.ts`       | хук | ✅     | Reauth + смена email            | `signInWithEmail` → `updateAuthUser`                           | `ChangeEmail`          |
+| `changeEmailSchema`    | `features/change-email/model/validation.ts`           | Zod | ✅     | Новый email + пароль            | —                                                              | `ChangeEmail`          |
+| `ChangeEmail`          | `features/change-email/ui/ChangeEmail.tsx`            | UI  | ✅     | Модалка смены email             | `Modal`, `Button`, `useChangeEmail`, `changeEmailSchema`       | `ProfileWidget` (слот) |
+| `useChangePassword`    | `features/change-password/model/useChangePassword.ts` | хук | ✅     | Reauth + смена пароля + signOut | `signInWithEmail` → `updateAuthUser` → `signOut` → navigate    | `ChangePassword`       |
+| `changePasswordSchema` | `features/change-password/model/validation.ts`        | Zod | ✅     | new/confirm/current password    | —                                                              | `ChangePassword`       |
+| `ChangePassword`       | `features/change-password/ui/ChangePassword.tsx`      | UI  | ✅     | Модалка смены пароля            | `Modal`, `Button`, `useChangePassword`, `changePasswordSchema` | `ProfileWidget` (слот) |
+| `useProjects`          | —                                                     | хук | 📋     | Список проектов                 | `getProjectsByOwnerId`                                         | ROADMAP                |
 
 ### 3.3 Widgets + pages — профиль
 
-| Имя             | Файл                                | Слой    | Статус | Назначение                          | Вызывает                                                                  | Кто использует |
-| --------------- | ----------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------------------------------- | -------------- |
+| Имя             | Файл                                   | Слой    | Статус | Назначение                          | Вызывает                                                                                    | Кто использует |
+| --------------- | -------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------------------------------------------------- | -------------- |
 | `ProfileWidget` | `widgets/profile/ui/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar`, `UpdateName`, `ChangeEmail`, `ChangePassword` | `ProfilePage`  |
-| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`    | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                                | `AppLayout`    |
-| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`  | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                                | `router`       |
+| `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`       | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                                                  | `AppLayout`    |
+| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`     | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                                                  | `router`       |
 
 ---
 
