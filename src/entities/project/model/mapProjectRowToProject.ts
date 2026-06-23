@@ -11,6 +11,7 @@ type ProjectListItemRow = Pick<
 type ProjectRow = ProjectListItemRow & {
   updated_at: string
   description: string | null
+  project_prefix: string
 }
 
 // маппер для проекта в списке проектов в профиле
@@ -28,6 +29,7 @@ export const mapProjectRowToProject = (projectRow: ProjectRow): Project => {
     ...mapProjectRowToProjectListItem(projectRow),
     description: projectRow.description,
     updatedAt: projectRow.updated_at,
+    projectPrefix: projectRow.project_prefix,
     boards: [],
   }
 }

@@ -63,6 +63,7 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `updateAuthUser`        | `shared/api/auth/updateAuthUser.ts`           | API    | ✅     | UPDATE email/password в Auth          | `withRetry` → `supabase.auth.updateUser`         | `useChangeEmail`, `useChangePassword`                  |
 | `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                                           |
 | `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`                                        |
+| `getProjectsByOwnerId`  | `shared/api/projects/getProjectsByOwnerId.ts` | API    | ✅     | SELECT `projects` по `owner_id`       | `withRetry` → `supabase.from('projects').select` | `getProjects`                                          |
 | `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`                                      |
 | `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`                                      |
 
@@ -77,6 +78,7 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `useAuth`               | `shared/lib/auth/session/useAuth.ts`         | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut`                                |
 | `AuthContext`           | `shared/lib/auth/session/AuthContext.ts`     | context | ✅     | React-контекст сессии               | —                                                | `AuthProvider`, `useAuth`                                                    |
 | `AuthContextType`       | `shared/lib/auth/session/AuthContextType.ts` | тип     | ✅     | `isAuth`, `user`, `signOut`, …      | —                                                | `AuthProvider`, `useAuth`                                                    |
+| `formatDateRu`          | `shared/lib/date/formatDateRu.ts`            | утилита | ✅     | Формат даты для UI (`ru-RU`)        | `Date.toLocaleDateString`                        | `ProjectCard`                                                                |
 
 ### 1.3 UI + config — `shared/ui`, `shared/config`
 
@@ -161,7 +163,6 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `useChangePassword`    | `features/change-password/model/useChangePassword.ts` | хук | ✅     | Reauth + смена пароля + signOut | `signInWithEmail` → `updateAuthUser` → `signOut` → navigate    | `ChangePassword`       |
 | `changePasswordSchema` | `features/change-password/model/validation.ts`        | Zod | ✅     | new/confirm/current password    | —                                                              | `ChangePassword`       |
 | `ChangePassword`       | `features/change-password/ui/ChangePassword.tsx`      | UI  | ✅     | Модалка смены пароля            | `Modal`, `Button`, `useChangePassword`, `changePasswordSchema` | `ProfileWidget` (слот) |
-| `useProjects`          | —                                                     | хук | 📋     | Список проектов                 | `getProjectsByOwnerId`                                         | ROADMAP                |
 
 ### 3.3 Widgets + pages — профиль
 
@@ -169,7 +170,20 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | --------------- | -------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------------------------------------------------- | -------------- |
 | `ProfileWidget` | `widgets/profile/ui/ProfileWidget.tsx` | widgets | ✅     | Loading + `ProfileCard` + слоты фич | `useProfile`, `UploadAvatar`, `RemoveAvatar`, `UpdateName`, `ChangeEmail`, `ChangePassword` | `ProfilePage`  |
 | `Sidebar`       | `widgets/sidebar/ui/Sidebar.tsx`       | widgets | ✅     | Мини-аватар в шапке                 | `useProfile`, `UserAvatar`                                                                  | `AppLayout`    |
-| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`     | pages   | ✅     | `/profile`                          | `ProfileWidget`, `SignOut`                                                                  | `router`       |
+| `ProfilePage`   | `pages/profile/ui/ProfilePage.tsx`     | pages   | ✅     | `/profile`                          | `ProfileWidget`, `ProjectsListWidgets`, `SignOut`                                           | `router`       |
+
+### 3.4 Projects на `/profile`
+
+| Имя                              | Файл                                               | Слой     | Статус | Назначение                              | Вызывает                                                 | Кто использует                   |
+| -------------------------------- | -------------------------------------------------- | -------- | ------ | --------------------------------------- | -------------------------------------------------------- | -------------------------------- |
+| `ProjectListItem`, `Project`     | `entities/project/model/types.ts`                  | entities | ✅     | Домен списка проектов и полного проекта | —                                                        | project API/UI                   |
+| `mapProjectRowToProjectListItem` | `entities/project/model/mapProjectRowToProject.ts` | entities | ✅     | Маппер row → `ProjectListItem`          | —                                                        | `getProjects`                    |
+| `mapProjectRowToProject`         | `entities/project/model/mapProjectRowToProject.ts` | entities | ✅     | Маппер row → полный `Project`           | —                                                        | `getProjectById` (следующий шаг) |
+| `projectKeys`                    | `entities/project/api/projectKeys.ts`              | entities | ✅     | TSQ ключи `projects`                    | —                                                        | `useProjects`, create-project    |
+| `getProjects`                    | `entities/project/api/getProjects.ts`              | entities | ✅     | Получение и маппинг списка проектов     | `getProjectsByOwnerId`, `mapProjectRowToProjectListItem` | `useProjects`                    |
+| `useProjects`                    | `entities/project/api/useProjects.ts`              | entities | ✅     | Query списка проектов по владельцу      | `useAuth`, `getProjects`, `projectKeys`                  | `ProjectsListWidgets`            |
+| `ProjectCard`                    | `entities/project/ui/ProjectCard.tsx`              | entities | ✅     | Карточка проекта в списке профиля       | `formatDateRu`                                           | `ProjectsListWidgets`            |
+| `ProjectsListWidgets`            | `widgets/projects-list/ui/ProjectsListWidget.tsx`  | widgets  | ✅     | Loading/error/empty/list для проектов   | `useProjects`, `ProjectCard`                             | `ProfilePage`                    |
 
 ---
 
@@ -192,7 +206,6 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `CreateTask`    | `features/create-task/ui/CreateTask.tsx`       | features | 🧪     | создание задачи       |
 | `ToggleSidebar` | `features/toggle-sidebar/ui/ToggleSidebar.tsx` | features | 🧪     | toggle sidebar        |
 | `TaskCard`      | `entities/task/ui/TaskCard.tsx`                | entities | 🧪     | карточка задачи       |
-| `ProjectCard`   | `entities/project/ui/ProjectCard.tsx`          | entities | 🧪     | карточка проекта      |
 | `ColumnCard`    | `entities/column/ui/ColumnCard.tsx`            | entities | 🧪     | карточка колонки      |
 | `Task`          | `entities/task/model/types.ts`                 | тип      | 🧪     | домен задачи без API  |
 | `Project`       | `entities/project/model/types.ts`              | тип      | 🧪     | домен проекта без API |
@@ -270,10 +283,24 @@ ChangePassword
   → onSuccess: signOut → navigate /sign-in
 ```
 
+### Список проектов на `/profile`
+
+```
+ProfilePage
+  → ProjectsListWidgets
+      → useProjects (enabled: auth ready)
+          → getProjects
+              → getProjectsByOwnerId (withRetry)
+              → mapProjectRowToProjectListItem
+      → ProjectCard
+          → formatDateRu(createdAt)
+```
+
 ---
 
 ## Changelog registry
 
+- **2026-06-23:** блок 7 профиля: `getProjectsByOwnerId`, `getProjects`, `projectKeys`, `useProjects`, `ProjectsListWidgets`, обновлён `ProjectCard`, добавлен `formatDateRu`
 - **2026-06-17:** `features/change-password`; `Modal.isCloseDisabled`; блок 3 профиля завершён
 - **2026-06-16:** `features/change-email` + `shared/ui/Modal` + `shared/api/auth/updateAuthUser`; слот `emailActions` в `ProfileWidget`
 - **2026-05-29:** `features/update-name` (блок 2): `useUpdateName`, `UpdateName`, `nameSchema`; ROADMAP — фокус блок 3

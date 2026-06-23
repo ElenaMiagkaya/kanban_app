@@ -2,7 +2,7 @@
 
 Учебный pet-проект Kanban-доски для портфолио на **Feature-Sliced Design**.
 
-**Текущий этап:** профиль на `/profile` (аватар через Supabase Storage, слоты в `ProfileCard`). Следующий шаг — редактирование имени (блок 2), затем projects и канбан.
+**Текущий этап:** профиль на `/profile` закрыт (аватар, имя, change-email, change-password), добавлен список проектов (`useProjects`, `ProjectsListWidgets`). Следующий шаг — кнопка/флоу создания проекта, страница `project/:id`, затем канбан.
 
 Подробный прогресс: **[docs/ROADMAP.md](./docs/ROADMAP.md)** · карта модулей: **[docs/REGISTRY.md](./docs/REGISTRY.md)** · интерактивно: `../canvases/kanban-app-registry.canvas.tsx`
 
@@ -62,6 +62,7 @@ npm run gen:types     # типы БД из Supabase → src/types/database.types
 - Роутинг и layout, auth (вход / регистрация / выход), guards, `AuthProvider`
 - Auth и Storage API: повтор при сетевых ошибках (`withRetry` + `isNetworkError`)
 - Профиль: `useProfile`, `ProfileCard` со слотами, upload/remove аватара, `UserAvatar` в sidebar
+- Проекты на `/profile`: `getProjectsByOwnerId`, `getProjects`, `projectKeys`, `useProjects`, `ProjectsListWidgets`, `ProjectCard`
 - Сгенерированные типы Supabase, маппер `Profile` из строки БД
 
 Полный список — в **[docs/ROADMAP.md](./docs/ROADMAP.md)** и **[docs/REGISTRY.md](./docs/REGISTRY.md)**.

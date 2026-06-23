@@ -11,5 +11,6 @@ export type ProjectListItem = {
 export type Project = ProjectListItem & {
   description: string | null
   updatedAt: string
+  projectPrefix: string
   boards: Board[]
 }

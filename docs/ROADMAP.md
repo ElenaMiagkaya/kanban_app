@@ -155,10 +155,10 @@ ProfileCard
 | `useProfile`  | `profiles` + email из сессии           |
 | `useProjects` | `projects` где `owner_id = auth.uid()` |
 
-- [ ] `shared/api`: `getProjectsByOwnerId` (SELECT, RLS по владельцу)
-- [ ] `entities/project`: доменная модель, `Row` / `Pick`, маппер, `getProjects`
-- [ ] `projectKeys` + `useProjects` + `enabled: !auth.isLoading && isAuth && Boolean(user?.id)`
-- [ ] Виджет / секция на `ProfilePage`: **список проектов** пользователя
+- [x] `shared/api`: `getProjectsByOwnerId` (SELECT, RLS по владельцу)
+- [x] `entities/project`: доменная модель, `Row` / `Pick`, маппер, `getProjects`
+- [x] `projectKeys` + `useProjects` + `enabled: !auth.isLoading && isAuth && Boolean(user?.id)`
+- [x] Виджет / секция на `ProfilePage`: **список проектов** пользователя
 - [ ] Клик по проекту → переход на `project/:projectId` (контент страницы может быть заглушкой)
 - [ ] Кнопка **«Создать проект»** на `/profile` (пока UI; логика создания — в блоке **Projects** ниже)
 
@@ -183,6 +183,8 @@ ProfilePage
 - [ ] После создания: `invalidateQueries({ queryKey: projectKeys.list(ownerId) })` или обновление кеша
 - [ ] Подключить кнопку «Создать проект» к mutation
 - [ ] Страница `project/:projectId` — минимальный UI (название проекта / заглушка до канбана)
+- [ ] `projects.project_prefix`: обязательный префикс проекта (латиница), уникальность `owner_id + project_prefix`
+- [ ] UI создания проекта: автоподстановка префикса из названия (первые 3 латинские буквы) + ручное редактирование
 
 ---
 
@@ -190,6 +192,7 @@ ProfilePage
 
 - [ ] Колонки и задачи, статус через `column_id`, RLS
 - [ ] TSQ для boards / tasks, ключи `boardKeys` / `taskKeys`
+- [ ] `tasks.task_number` + атомарная нумерация задач по проекту (`PREFIX-N`) через RPC/функцию БД
 
 ---
 
