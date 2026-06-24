@@ -78,7 +78,7 @@ const ChangeEmail = ({ UserEmail }: { UserEmail: string }) => {
               autoComplete="new-password"
               onChange={handleChange}
             />
-            <Button type="submit" onClick={() => {}} disabled={isPending}>
+            <Button type="submit" disabled={isPending}>
               {isPending ? 'Изменение...' : 'Изменить email'}
             </Button>
             {isError && error && <p>Ошибка: {mapAuthErrorToMessage(error)}</p>}

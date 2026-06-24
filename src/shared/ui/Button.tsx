@@ -1,5 +1,5 @@
 interface ButtonProps {
-  onClick: () => void
+  onClick?: () => void
   width?: string
   height?: string
   backgroundColor?: string

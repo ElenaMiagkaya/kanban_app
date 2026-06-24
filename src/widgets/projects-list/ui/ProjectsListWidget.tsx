@@ -1,5 +1,6 @@
 import { useProjects } from '@entities/project'
 import { ProjectCard } from '@entities/project'
+import { CreateProject } from '@features/create-project'
 
 const ProjectsListWidgets = () => {
   const { data: projects, isPending, isError, error, isLoading, user } = useProjects()
@@ -20,6 +21,7 @@ const ProjectsListWidgets = () => {
         projects &&
         projects.length > 0 &&
         projects.map((project) => <ProjectCard key={project.id} project={project} />)}
+      <CreateProject />
     </section>
   )
 }

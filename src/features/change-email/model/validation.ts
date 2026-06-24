@@ -4,6 +4,7 @@ export const changeEmailSchema = (UserEmail: string) =>
   z.object({
     newEmail: z
       .email({ message: 'Введите корректный email' })
+      .trim()
       .refine((email) => email !== UserEmail, {
         message: 'Email уже используется',
       }),

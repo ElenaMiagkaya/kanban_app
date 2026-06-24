@@ -102,6 +102,7 @@ export type Database = {
           description: string | null
           id: string
           owner_id: string
+          project_prefix: string
           title: string
           updated_at: string
         }
@@ -110,6 +111,7 @@ export type Database = {
           description?: string | null
           id?: string
           owner_id: string
+          project_prefix: string
           title: string
           updated_at?: string
         }
@@ -118,6 +120,7 @@ export type Database = {
           description?: string | null
           id?: string
           owner_id?: string
+          project_prefix?: string
           title?: string
           updated_at?: string
         }
@@ -130,6 +133,7 @@ export type Database = {
           description: string | null
           id: string
           position: number
+          task_number: number
           title: string
           updated_at: string
         }
@@ -139,6 +143,7 @@ export type Database = {
           description?: string | null
           id?: string
           position?: number
+          task_number: number
           title: string
           updated_at?: string
         }
@@ -148,6 +153,7 @@ export type Database = {
           description?: string | null
           id?: string
           position?: number
+          task_number?: number
           title?: string
           updated_at?: string
         }

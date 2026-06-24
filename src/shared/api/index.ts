@@ -15,4 +15,5 @@ export { uploadAvatarFile } from './storage/uploadAvatarFile'
 export { removeAvatarFile } from './storage/removeAvatarFile'
 
 // функции для работы с проектами
-export { getProjectsByOwnerId } from './projects/getProjectsByOwnerId'
+export { getProjectsByOwnerId } from './projects/getProjectsByOwnerId' //список проектов по owner_id
+export { createNewProject } from './projects/createNewProject' //создание нового проекта

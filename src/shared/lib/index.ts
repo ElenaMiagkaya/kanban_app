@@ -12,3 +12,5 @@ export type { AuthContextType } from './auth/session/AuthContextType'
 export { useAuth } from './auth/session/useAuth'
 //преобразование даты в локальный формат
 export { formatDateRu } from './date/formatDateRu'
+//преобразование кириллических символов в латинские
+export { transliterateCyrillicToLatin } from './string/transliterateCyrillicToLatin'

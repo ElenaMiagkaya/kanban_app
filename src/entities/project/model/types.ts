@@ -14,3 +14,10 @@ export type Project = ProjectListItem & {
   projectPrefix: string
   boards: Board[]
 }
+
+// тип для создания проекта
+export type CreateProjectInput = {
+  title: string
+  description?: string | null
+  projectPrefix: string
+}

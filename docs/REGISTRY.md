@@ -64,6 +64,7 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                                           |
 | `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`                                        |
 | `getProjectsByOwnerId`  | `shared/api/projects/getProjectsByOwnerId.ts` | API    | ✅     | SELECT `projects` по `owner_id`       | `withRetry` → `supabase.from('projects').select` | `getProjects`                                          |
+| `createNewProject`      | `shared/api/projects/createNewProject.ts`     | API    | 🧪     | INSERT проекта в `projects`           | `withRetry` → `supabase.from('projects').insert` | `createProject`                                        |
 | `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`                                      |
 | `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`                                      |
 
@@ -174,16 +175,21 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 3.4 Projects на `/profile`
 
-| Имя                              | Файл                                               | Слой     | Статус | Назначение                              | Вызывает                                                 | Кто использует                   |
-| -------------------------------- | -------------------------------------------------- | -------- | ------ | --------------------------------------- | -------------------------------------------------------- | -------------------------------- |
-| `ProjectListItem`, `Project`     | `entities/project/model/types.ts`                  | entities | ✅     | Домен списка проектов и полного проекта | —                                                        | project API/UI                   |
-| `mapProjectRowToProjectListItem` | `entities/project/model/mapProjectRowToProject.ts` | entities | ✅     | Маппер row → `ProjectListItem`          | —                                                        | `getProjects`                    |
-| `mapProjectRowToProject`         | `entities/project/model/mapProjectRowToProject.ts` | entities | ✅     | Маппер row → полный `Project`           | —                                                        | `getProjectById` (следующий шаг) |
-| `projectKeys`                    | `entities/project/api/projectKeys.ts`              | entities | ✅     | TSQ ключи `projects`                    | —                                                        | `useProjects`, create-project    |
-| `getProjects`                    | `entities/project/api/getProjects.ts`              | entities | ✅     | Получение и маппинг списка проектов     | `getProjectsByOwnerId`, `mapProjectRowToProjectListItem` | `useProjects`                    |
-| `useProjects`                    | `entities/project/api/useProjects.ts`              | entities | ✅     | Query списка проектов по владельцу      | `useAuth`, `getProjects`, `projectKeys`                  | `ProjectsListWidgets`            |
-| `ProjectCard`                    | `entities/project/ui/ProjectCard.tsx`              | entities | ✅     | Карточка проекта в списке профиля       | `formatDateRu`                                           | `ProjectsListWidgets`            |
-| `ProjectsListWidgets`            | `widgets/projects-list/ui/ProjectsListWidget.tsx`  | widgets  | ✅     | Loading/error/empty/list для проектов   | `useProjects`, `ProjectCard`                             | `ProfilePage`                    |
+| Имя                              | Файл                                                  | Слой     | Статус | Назначение                              | Вызывает                                                                          | Кто использует                                  |
+| -------------------------------- | ----------------------------------------------------- | -------- | ------ | --------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `ProjectListItem`, `Project`     | `entities/project/model/types.ts`                     | entities | ✅     | Домен списка проектов и полного проекта | —                                                                                 | project API/UI                                  |
+| `CreateProjectInput`             | `entities/project/model/types.ts`                     | entities | 🧪     | Входные данные для создания проекта     | —                                                                                 | `mapProjectToProjectInsert`, `useCreateProject` |
+| `mapProjectRowToProjectListItem` | `entities/project/model/mapProjectRowToProject.ts`    | entities | ✅     | Маппер row → `ProjectListItem`          | —                                                                                 | `getProjects`                                   |
+| `mapProjectRowToProject`         | `entities/project/model/mapProjectRowToProject.ts`    | entities | ✅     | Маппер row → полный `Project`           | —                                                                                 | `getProjectById` (следующий шаг)                |
+| `mapProjectToProjectInsert`      | `entities/project/model/mapProjectToProjectInsert.ts` | entities | 🧪     | Маппер input → `projects.Insert`        | —                                                                                 | `createProject`                                 |
+| `projectKeys`                    | `entities/project/api/projectKeys.ts`                 | entities | ✅     | TSQ ключи `projects`                    | —                                                                                 | `useProjects`, create-project                   |
+| `getProjects`                    | `entities/project/api/getProjects.ts`                 | entities | ✅     | Получение и маппинг списка проектов     | `getProjectsByOwnerId`, `mapProjectRowToProjectListItem`                          | `useProjects`                                   |
+| `createProject`                  | `entities/project/api/createProject.ts`               | entities | 🧪     | Создание проекта + маппинг ответа       | `mapProjectToProjectInsert`, `createNewProject`, `mapProjectRowToProjectListItem` | `useCreateProject`                              |
+| `useProjects`                    | `entities/project/api/useProjects.ts`                 | entities | ✅     | Query списка проектов по владельцу      | `useAuth`, `getProjects`, `projectKeys`                                           | `ProjectsListWidgets`                           |
+| `ProjectCard`                    | `entities/project/ui/ProjectCard.tsx`                 | entities | ✅     | Карточка проекта в списке профиля       | `formatDateRu`                                                                    | `ProjectsListWidgets`                           |
+| `ProjectsListWidgets`            | `widgets/projects-list/ui/ProjectsListWidget.tsx`     | widgets  | ✅     | Loading/error/empty/list для проектов   | `useProjects`, `ProjectCard`                                                      | `ProfilePage`                                   |
+| `useCreateProject`               | `features/create-project/model/useCreateProject.ts`   | features | 🧪     | Mutation создания проекта + invalidate  | `useAuth`, `createProject`, `projectKeys`, `invalidateQueries`                    | `CreateProject`                                 |
+| `CreateProject`                  | `features/create-project/ui/CreateProject.tsx`        | features | 🧪     | Кнопка-черновик создания проекта        | `useCreateProject`                                                                | `ProjectsListWidgets`                           |
 
 ---
 
@@ -296,11 +302,25 @@ ProfilePage
           → formatDateRu(createdAt)
 ```
 
+### Создание проекта (черновой поток)
+
+```
+ProjectsListWidgets
+  → CreateProject
+      → useCreateProject.mutate(input)
+          → createProject
+              → mapProjectToProjectInsert
+              → createNewProject (withRetry, insert)
+              → mapProjectRowToProjectListItem
+          → onSuccess: invalidateQueries(projectKeys.list(ownerId))
+```
+
 ---
 
 ## Changelog registry
 
 - **2026-06-23:** блок 7 профиля: `getProjectsByOwnerId`, `getProjects`, `projectKeys`, `useProjects`, `ProjectsListWidgets`, обновлён `ProjectCard`, добавлен `formatDateRu`
+- **2026-06-23:** добавлен черновик create-project: `createNewProject`, `mapProjectToProjectInsert`, `createProject`, `useCreateProject`, `CreateProject`
 - **2026-06-17:** `features/change-password`; `Modal.isCloseDisabled`; блок 3 профиля завершён
 - **2026-06-16:** `features/change-email` + `shared/ui/Modal` + `shared/api/auth/updateAuthUser`; слот `emailActions` в `ProfileWidget`
 - **2026-05-29:** `features/update-name` (блок 2): `useUpdateName`, `UpdateName`, `nameSchema`; ROADMAP — фокус блок 3
