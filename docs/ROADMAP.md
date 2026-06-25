@@ -4,7 +4,7 @@
 
 **Карта модулей:** [REGISTRY.md](./REGISTRY.md) · интерактивно: `canvases/kanban-app-registry.canvas.tsx`
 
-**Текущий фокус:** **блок 7** — список projects на `/profile` + `useProjects`. Блок 3 (email, пароль, Modal) завершён; блоки 1–2 готовы.
+**Текущий фокус:** **блок 8** — открытие проекта с `/profile` (`ProjectCard` → `project/:projectId`) + список досок на `ProjectPage`. Блок 7 (список projects) и **create-project** завершены; блоки 1–3 готовы.
 
 ---
 
@@ -16,8 +16,11 @@
 4. [x] **Блок 1 (фичи):** upload/remove аватара (Storage + `profiles.avatar_url`) + `avatarActions`
 5. [x] **Блок 2 — имя:** `update-name` → слот `nameSlot`
 6. [x] **Блок 3 — auth:** email и пароль — отдельные features + модалки (не `profiles`)
-7. Список projects на `/profile` + `useProjects` ← **сейчас**
-8. «Создать проект», `project/:id`, канбан
+7. [x] Список projects на `/profile` + `useProjects`
+8. [x] **create-project** — Modal, Zod, автопрефикс, `useMutation`
+9. Открытие проекта (`ProjectCard` → `project/:projectId`) + доски на `ProjectPage` ← **сейчас**
+10. **delete-project** — удаление с карточки + подтверждение в Modal
+11. Канбан (колонки, задачи)
 
 ---
 
@@ -159,16 +162,18 @@ ProfileCard
 - [x] `entities/project`: доменная модель, `Row` / `Pick`, маппер, `getProjects`
 - [x] `projectKeys` + `useProjects` + `enabled: !auth.isLoading && isAuth && Boolean(user?.id)`
 - [x] Виджет / секция на `ProfilePage`: **список проектов** пользователя
-- [ ] Клик по проекту → переход на `project/:projectId` (контент страницы может быть заглушкой)
-- [ ] Кнопка **«Создать проект»** на `/profile` (пока UI; логика создания — в блоке **Projects** ниже)
+- [x] Кнопка **«Создать проект»** на `/profile` — feature `create-project` (Modal + mutation)
+- [ ] Клик по карточке проекта → переход на `project/:projectId` (Link в widget, не в entity)
+- [ ] Кнопка **«Удалить проект»** на карточке (feature `delete-project`, Modal подтверждения)
 
 **Схема страницы `/profile`:**
 
 ```text
 ProfilePage
 ├── ProfileWidget              → useProfile + ProfileCard(slots) + features
-├── ProjectsListWidget         → useProjects
-├── CreateProjectButton
+├── ProjectsListWidget         → useProjects + ProjectCard + CreateProject
+│     ├── Link → project/:projectId   (следующий шаг)
+│     └── DeleteProject               (после открытия проекта)
 └── SignOut
 ```
 
@@ -176,15 +181,51 @@ ProfilePage
 
 ---
 
-## Projects (после списка на профиле)
+## Projects — create-project (готово)
 
-- [ ] `shared/api`: `createProject` (INSERT, `owner_id` = текущий пользователь)
-- [ ] `feature` create-project + `useMutation`
-- [ ] После создания: `invalidateQueries({ queryKey: projectKeys.list(ownerId) })` или обновление кеша
-- [ ] Подключить кнопку «Создать проект» к mutation
-- [ ] Страница `project/:projectId` — минимальный UI (название проекта / заглушка до канбана)
-- [ ] `projects.project_prefix`: обязательный префикс проекта (латиница), уникальность `owner_id + project_prefix`
-- [ ] UI создания проекта: автоподстановка префикса из названия (первые 3 латинские буквы) + ручное редактирование
+- [x] `shared/api`: `createNewProject` (INSERT, `owner_id` = текущий пользователь)
+- [x] `entities/project`: `createProject`, `mapProjectToProjectInsert`, `CreateProjectInput`
+- [x] `features/create-project`: Modal + форма, Zod (`createProjectSchema`), `useCreateProject`
+- [x] После создания: `invalidateQueries({ queryKey: projectKeys.list(ownerId) })`
+- [x] `projects.project_prefix`: CHECK в БД `^[A-Z]{3,10}$`; на клиенте Zod `^[A-Z]{3,5}$`; уникальность `owner_id + project_prefix`
+- [x] UI: автопрефикс из **первого слова** названия (транслит кириллицы → 3 буквы) + ручное редактирование (`isPrefixTouched`); длина префикса на кнопке submit
+- [x] `shared/lib/string/transliterateCyrillicToLatin`, `entities/project/deriveProjectPrefixFromTitle`
+- [x] `description`: пустая строка из формы → `null` (Zod `transform`)
+
+---
+
+## Projects — открытие и удаление (следующие шаги)
+
+### Открытие проекта ← **сейчас**
+
+- [ ] `shared/config`: `getProjectRoute(projectId)` → `/project/:projectId`
+- [ ] `widgets/projects-list`: обернуть `ProjectCard` в `<Link>` (роутинг в widget, не в entity)
+- [ ] `shared/api`: `getProjectById`, `getBoardsByProjectId`
+- [ ] `entities/project`: `getProject`, `useProject(projectId)`; `projectKeys.detail` уже есть
+- [ ] `entities/board` (или в project query): `getBoards`, `useBoards(projectId)`
+- [ ] `pages/project/ProjectPage`: `useParams`, загрузка проекта + список досок (минимальный UI до канбана)
+
+**Схема:**
+
+```text
+ProjectsListWidget
+  → Link to={getProjectRoute(id)}
+      → ProjectCard
+  → DeleteProject (отдельная кнопка, stopPropagation)
+
+ProjectPage (/project/:projectId)
+  → useProject(projectId)
+  → список досок (title + id)
+```
+
+### Удаление проекта (после открытия)
+
+- [ ] `shared/api`: `deleteProjectById` (DELETE, RLS по `owner_id`)
+- [ ] `entities/project`: `deleteProject`
+- [ ] `features/delete-project`: `useDeleteProject`, Modal подтверждения (как `change-password`)
+- [ ] `onSuccess`: `invalidateQueries(projectKeys.list)` + `removeQueries(projectKeys.detail)`; `navigate(/profile)` если удалили со страницы проекта
+- [ ] Проверить CASCADE в БД: `projects` → `boards` → `board_columns` → `tasks`
+- [ ] Кнопка на карточке в `ProjectsListWidget`; клик не должен открывать проект (`stopPropagation`)
 
 ---
 
@@ -196,7 +237,21 @@ ProfilePage
 
 ---
 
-## Полировка (когда появится потребность)
+## Полировка / MVP-2 (когда появится потребность)
+
+### create-project — форма и префикс
+
+> Сейчас (MVP): submit через `createProjectSchema`, длина префикса на кнопке, ошибки мутации через `mapAuthErrorToMessage` (временно).
+
+- [ ] **Live-валидация префикса:** только латиница при вводе (`projectPrefixLettersSchema`, `prefixFormatError` в UI); длина — по-прежнему на кнопке + Zod на submit
+- [ ] **Нормализация регистра:** `.transform(toUpperCase)` в Zod или в инпуте — чтобы `moy` не падало на CHECK `^[A-Z]{…}$`
+- [ ] **Дубликат префикса:** проверка `owner_id + project_prefix` до INSERT или маппинг `23505` → «Префикс уже занят»
+  - вариант A: `shared/api` `existsProjectPrefix(ownerId, prefix)` (SELECT)
+  - вариант B: только маппер ошибок Supabase после failed mutation
+- [ ] **`mapSupabaseProjectErrorToMessage`** (или расширить общий маппер) — не сырой `projects_prefix_format_chk` / `duplicate key`
+- [ ] Согласовать доки с БД, если изменится CHECK на `project_prefix`
+
+### Общее
 
 - [ ] Маппер ошибок загрузки профиля / Supabase (не сырой `error.message`)
 - [ ] `useMutation` для sign-in / sign-up / sign-out; при `signOut` — `queryClient.removeQueries` / `clear`
@@ -244,6 +299,12 @@ ProfilePage
 - [x] **Блок 1 — аватар:** Storage + `avatar_url`, `upload-avatar` / `remove-avatar`, слот `avatarActions`
 - [x] **Блок 2 — имя:** `update-name`, `useUpdateName`, слот `nameSlot`
 - [x] **Блок 3 — auth:** `change-email`, `change-password`, `Modal`, `updateAuthUser`, слоты `emailActions` / `passwordActions`
+
+### Projects на `/profile`
+
+- [x] `getProjectsByOwnerId`, `getProjects`, `projectKeys`, `useProjects`, `ProjectsListWidget`, `ProjectCard`, `formatDateRu`
+- [x] **create-project:** `createNewProject`, `createProject`, `useCreateProject`, Modal + Zod + автопрефикс
+- [x] `transliterateCyrillicToLatin`, `deriveProjectPrefixFromTitle`; `Button.onClick` опционален (submit в формах)
 
 ### TanStack Query
 

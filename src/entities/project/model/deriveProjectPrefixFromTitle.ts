@@ -7,6 +7,6 @@ export const deriveProjectPrefixFromTitle = (title: string): string => {
   // преобразуем первое слово в латинские буквы
   // ищем все латинские буквы в первом слове
   const letters = transliterateCyrillicToLatin(firstWord).match(/[a-z]/gi) ?? []
-  // возвращаем первые 3 буквы в верхнем регистре
+  // возвращаем первые три буквы в верхнем регистре
   return letters.slice(0, 3).join('').toUpperCase()
 }

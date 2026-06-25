@@ -67,7 +67,7 @@ const CreateProject = () => {
   // функция для обработки изменения значения в input префикса проекта
   const handlePrefixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrefixTouched(true) // устанавливаем флаг того, что префикс проекта был touched
-    setProjectPrefix(e.target.value) // устанавливаем значение префикса проекта, которое ввел пользователь
+    setProjectPrefix(e.target.value.toUpperCase()) // устанавливаем значение префикса проекта, которое ввел пользователь
     handleChange() // сброс ошибок
   }
 
@@ -84,27 +84,29 @@ const CreateProject = () => {
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
         >
+          <label htmlFor="title">Название проекта*</label>
+          <input id="title" type="text" name="title" onChange={handleTitleChange} />
+          <label htmlFor="description">Описание проекта</label>
           <input
+            id="description"
             type="text"
-            placeholder="Название проекта"
-            name="title"
-            onChange={handleTitleChange}
-          />
-          <input
-            type="text"
-            placeholder="Описание проекта"
+            placeholder="необязательное поле"
             name="description"
             onChange={handleChange}
           />
+          <label htmlFor="projectPrefix">Префикс проекта 3-5 символов*</label>
           <input
+            id="projectPrefix"
             type="text"
-            placeholder="Префикс проекта"
             name="projectPrefix"
             value={projectPrefix}
             onChange={handlePrefixChange}
             autoComplete="off"
           />
-          <Button type="submit" disabled={isPending}>
+          <Button
+            type="submit"
+            disabled={isPending || projectPrefix.length < 3 || projectPrefix.length > 5}
+          >
             {isPending ? 'Создание...' : 'Создать проект'}
           </Button>
           {isError && error && <p>Ошибка при создании проекта: {mapAuthErrorToMessage(error)}</p>}

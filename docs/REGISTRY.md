@@ -64,31 +64,32 @@ AuthProvider.refreshAuth → getSession (withRetry)
 | `getProfileByUserId`    | `shared/api/profile/getProfileByUserId.ts`    | API    | ✅     | SELECT `profiles`                     | `withRetry` → `supabase.from('profiles')`        | `getProfile`                                           |
 | `updateProfileByUserId` | `shared/api/profile/updateProfileByUserId.ts` | API    | ✅     | UPDATE `profiles`                     | `withRetry` → `supabase.from('profiles').update` | `updateProfile`                                        |
 | `getProjectsByOwnerId`  | `shared/api/projects/getProjectsByOwnerId.ts` | API    | ✅     | SELECT `projects` по `owner_id`       | `withRetry` → `supabase.from('projects').select` | `getProjects`                                          |
-| `createNewProject`      | `shared/api/projects/createNewProject.ts`     | API    | 🧪     | INSERT проекта в `projects`           | `withRetry` → `supabase.from('projects').insert` | `createProject`                                        |
+| `createNewProject`      | `shared/api/projects/createNewProject.ts`     | API    | ✅     | INSERT проекта в `projects`           | `withRetry` → `supabase.from('projects').insert` | `createProject`                                        |
 | `uploadAvatarFile`      | `shared/api/storage/uploadAvatarFile.ts`      | API    | ✅     | Upload в Storage → public URL + `?v=` | `withRetry` → `storage.upload`, `getPublicUrl`   | `useUploadAvatar`                                      |
 | `removeAvatarFile`      | `shared/api/storage/removeAvatarFile.ts`      | API    | ✅     | DELETE файла из Storage               | `withRetry` → `storage.remove`                   | `useRemoveAvatar`                                      |
 
 ### 1.2 Lib — `shared/lib`
 
-| Имя                     | Файл                                         | Тип     | Статус | Назначение                          | Вызывает                                         | Кто использует                                                               |
-| ----------------------- | -------------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `isNetworkError`        | `shared/lib/network/isNetworkError.ts`       | утилита | ✅     | Сетевая ли ошибка (retry + auth UI) | маркеры в `message`, `isAuthRetryableFetchError` | `withRetry`, `mapAuthErrorToMessage`                                         |
-| `withRetry`             | `shared/lib/retry/withRetry.ts`              | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, profile API, Storage API                                           |
-| `mapAuthErrorToMessage` | `shared/lib/auth/mapAuthErrorToMessage.ts`   | утилита | ✅     | Текст ошибки для auth UI            | `isNetworkError` + коды Supabase                 | `SignInByEmail`, `SignUpByEmail`, `SignOut`, `ChangeEmail`, `ChangePassword` |
-| `getInitials`           | `shared/lib/profile/getInitials.ts`          | утилита | ✅     | Инициалы из имени                   | —                                                | `UserAvatar`                                                                 |
-| `useAuth`               | `shared/lib/auth/session/useAuth.ts`         | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut`                                |
-| `AuthContext`           | `shared/lib/auth/session/AuthContext.ts`     | context | ✅     | React-контекст сессии               | —                                                | `AuthProvider`, `useAuth`                                                    |
-| `AuthContextType`       | `shared/lib/auth/session/AuthContextType.ts` | тип     | ✅     | `isAuth`, `user`, `signOut`, …      | —                                                | `AuthProvider`, `useAuth`                                                    |
-| `formatDateRu`          | `shared/lib/date/formatDateRu.ts`            | утилита | ✅     | Формат даты для UI (`ru-RU`)        | `Date.toLocaleDateString`                        | `ProjectCard`                                                                |
+| Имя                            | Файл                                                | Тип     | Статус | Назначение                          | Вызывает                                         | Кто использует                                                               |
+| ------------------------------ | --------------------------------------------------- | ------- | ------ | ----------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `isNetworkError`               | `shared/lib/network/isNetworkError.ts`              | утилита | ✅     | Сетевая ли ошибка (retry + auth UI) | маркеры в `message`, `isAuthRetryableFetchError` | `withRetry`, `mapAuthErrorToMessage`                                         |
+| `withRetry`                    | `shared/lib/retry/withRetry.ts`                     | утилита | ✅     | Повтор `fn` при сетевых ошибках     | `isNetworkError` (дефолт), `wait`                | auth API, profile API, Storage API                                           |
+| `mapAuthErrorToMessage`        | `shared/lib/auth/mapAuthErrorToMessage.ts`          | утилита | ✅     | Текст ошибки для auth UI            | `isNetworkError` + коды Supabase                 | `SignInByEmail`, `SignUpByEmail`, `SignOut`, `ChangeEmail`, `ChangePassword` |
+| `getInitials`                  | `shared/lib/profile/getInitials.ts`                 | утилита | ✅     | Инициалы из имени                   | —                                                | `UserAvatar`                                                                 |
+| `transliterateCyrillicToLatin` | `shared/lib/string/transliterateCyrillicToLatin.ts` | утилита | ✅     | Кириллица → латиница для префикса   | map символов                                     | `deriveProjectPrefixFromTitle`                                               |
+| `useAuth`                      | `shared/lib/auth/session/useAuth.ts`                | хук     | ✅     | Читает `AuthContext`                | `AuthContext`                                    | guards, `useProfile`, оркестраторы, `SignOut`                                |
+| `AuthContext`                  | `shared/lib/auth/session/AuthContext.ts`            | context | ✅     | React-контекст сессии               | —                                                | `AuthProvider`, `useAuth`                                                    |
+| `AuthContextType`              | `shared/lib/auth/session/AuthContextType.ts`        | тип     | ✅     | `isAuth`, `user`, `signOut`, …      | —                                                | `AuthProvider`, `useAuth`                                                    |
+| `formatDateRu`                 | `shared/lib/date/formatDateRu.ts`                   | утилита | ✅     | Формат даты для UI (`ru-RU`)        | `Date.toLocaleDateString`                        | `ProjectCard`                                                                |
 
 ### 1.3 UI + config — `shared/ui`, `shared/config`
 
-| Имя          | Файл                        | Тип    | Статус | Назначение                                            | Вызывает      | Кто использует                                                  |
-| ------------ | --------------------------- | ------ | ------ | ----------------------------------------------------- | ------------- | --------------------------------------------------------------- |
-| `Button`     | `shared/ui/Button.tsx`      | UI     | ✅     | Кнопка                                                | —             | `UploadAvatar`, `RemoveAvatar`, `ChangeEmail`, `ChangePassword` |
-| `UserAvatar` | `shared/ui/UserAvatar.tsx`  | UI     | ✅     | Круг: фото / инициалы / пусто                         | `getInitials` | `ProfileCard`, `Sidebar`                                        |
-| `Modal`      | `shared/ui/modal/modal.tsx` | UI     | ✅     | Модалка: overlay, Esc, scroll lock, `isCloseDisabled` | —             | `ChangeEmail`, `ChangePassword`                                 |
-| `ROUTES`     | `shared/config/routes.ts`   | config | ✅     | Пути маршрутов                                        | —             | `router`, guards, features                                      |
+| Имя          | Файл                        | Тип    | Статус | Назначение                                            | Вызывает      | Кто использует                                                                   |
+| ------------ | --------------------------- | ------ | ------ | ----------------------------------------------------- | ------------- | -------------------------------------------------------------------------------- |
+| `Button`     | `shared/ui/Button.tsx`      | UI     | ✅     | Кнопка (`onClick?` для submit-форм)                   | —             | `UploadAvatar`, `RemoveAvatar`, `ChangeEmail`, `ChangePassword`, `CreateProject` |
+| `UserAvatar` | `shared/ui/UserAvatar.tsx`  | UI     | ✅     | Круг: фото / инициалы / пусто                         | `getInitials` | `ProfileCard`, `Sidebar`                                                         |
+| `Modal`      | `shared/ui/modal/modal.tsx` | UI     | ✅     | Модалка: overlay, Esc, scroll lock, `isCloseDisabled` | —             | `ChangeEmail`, `ChangePassword`, `CreateProject`                                 |
+| `ROUTES`     | `shared/config/routes.ts`   | config | ✅     | Пути маршрутов                                        | —             | `router`, guards, features                                                       |
 
 ---
 
@@ -175,31 +176,45 @@ AuthProvider.refreshAuth → getSession (withRetry)
 
 ### 3.4 Projects на `/profile`
 
-| Имя                              | Файл                                                  | Слой     | Статус | Назначение                              | Вызывает                                                                          | Кто использует                                  |
-| -------------------------------- | ----------------------------------------------------- | -------- | ------ | --------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `ProjectListItem`, `Project`     | `entities/project/model/types.ts`                     | entities | ✅     | Домен списка проектов и полного проекта | —                                                                                 | project API/UI                                  |
-| `CreateProjectInput`             | `entities/project/model/types.ts`                     | entities | 🧪     | Входные данные для создания проекта     | —                                                                                 | `mapProjectToProjectInsert`, `useCreateProject` |
-| `mapProjectRowToProjectListItem` | `entities/project/model/mapProjectRowToProject.ts`    | entities | ✅     | Маппер row → `ProjectListItem`          | —                                                                                 | `getProjects`                                   |
-| `mapProjectRowToProject`         | `entities/project/model/mapProjectRowToProject.ts`    | entities | ✅     | Маппер row → полный `Project`           | —                                                                                 | `getProjectById` (следующий шаг)                |
-| `mapProjectToProjectInsert`      | `entities/project/model/mapProjectToProjectInsert.ts` | entities | 🧪     | Маппер input → `projects.Insert`        | —                                                                                 | `createProject`                                 |
-| `projectKeys`                    | `entities/project/api/projectKeys.ts`                 | entities | ✅     | TSQ ключи `projects`                    | —                                                                                 | `useProjects`, create-project                   |
-| `getProjects`                    | `entities/project/api/getProjects.ts`                 | entities | ✅     | Получение и маппинг списка проектов     | `getProjectsByOwnerId`, `mapProjectRowToProjectListItem`                          | `useProjects`                                   |
-| `createProject`                  | `entities/project/api/createProject.ts`               | entities | 🧪     | Создание проекта + маппинг ответа       | `mapProjectToProjectInsert`, `createNewProject`, `mapProjectRowToProjectListItem` | `useCreateProject`                              |
-| `useProjects`                    | `entities/project/api/useProjects.ts`                 | entities | ✅     | Query списка проектов по владельцу      | `useAuth`, `getProjects`, `projectKeys`                                           | `ProjectsListWidgets`                           |
-| `ProjectCard`                    | `entities/project/ui/ProjectCard.tsx`                 | entities | ✅     | Карточка проекта в списке профиля       | `formatDateRu`                                                                    | `ProjectsListWidgets`                           |
-| `ProjectsListWidgets`            | `widgets/projects-list/ui/ProjectsListWidget.tsx`     | widgets  | ✅     | Loading/error/empty/list для проектов   | `useProjects`, `ProjectCard`                                                      | `ProfilePage`                                   |
-| `useCreateProject`               | `features/create-project/model/useCreateProject.ts`   | features | 🧪     | Mutation создания проекта + invalidate  | `useAuth`, `createProject`, `projectKeys`, `invalidateQueries`                    | `CreateProject`                                 |
-| `CreateProject`                  | `features/create-project/ui/CreateProject.tsx`        | features | 🧪     | Кнопка-черновик создания проекта        | `useCreateProject`                                                                | `ProjectsListWidgets`                           |
+| Имя                                | Файл                                                      | Слой     | Статус | Назначение                                                     | Вызывает                                                                             | Кто использует                                  |
+| ---------------------------------- | --------------------------------------------------------- | -------- | ------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| `ProjectListItem`, `Project`       | `entities/project/model/types.ts`                         | entities | ✅     | Домен списка проектов и полного проекта                        | —                                                                                    | project API/UI                                  |
+| `CreateProjectInput`               | `entities/project/model/types.ts`                         | entities | ✅     | Входные данные для создания проекта                            | —                                                                                    | `mapProjectToProjectInsert`, `useCreateProject` |
+| `deriveProjectPrefixFromTitle`     | `entities/project/model/deriveProjectPrefixFromTitle.ts`  | entities | ✅     | Автопрефикс: 1-е слово → транслит → 3 буквы                    | `transliterateCyrillicToLatin`                                                       | `CreateProject`                                 |
+| `mapProjectRowToProjectListItem`   | `entities/project/model/mapProjectRowToProject.ts`        | entities | ✅     | Маппер row → `ProjectListItem`                                 | —                                                                                    | `getProjects`                                   |
+| `mapProjectRowToProject`           | `entities/project/model/mapProjectRowToProject.ts`        | entities | ✅     | Маппер row → полный `Project`                                  | —                                                                                    | `getProjectById` (следующий шаг)                |
+| `mapProjectToProjectInsert`        | `entities/project/model/mapProjectToProjectInsert.ts`     | entities | ✅     | Маппер input → `projects.Insert`                               | —                                                                                    | `createProject`                                 |
+| `projectKeys`                      | `entities/project/api/projectKeys.ts`                     | entities | ✅     | TSQ ключи `projects`                                           | —                                                                                    | `useProjects`, create-project                   |
+| `getProjects`                      | `entities/project/api/getProjects.ts`                     | entities | ✅     | Получение и маппинг списка проектов                            | `getProjectsByOwnerId`, `mapProjectRowToProjectListItem`                             | `useProjects`                                   |
+| `createProject`                    | `entities/project/api/createProject.ts`                   | entities | ✅     | Создание проекта + маппинг ответа                              | `mapProjectToProjectInsert`, `createNewProject`, `mapProjectRowToProjectListItem`    | `useCreateProject`                              |
+| `useProjects`                      | `entities/project/api/useProjects.ts`                     | entities | ✅     | Query списка проектов по владельцу                             | `useAuth`, `getProjects`, `projectKeys`                                              | `ProjectsListWidgets`                           |
+| `ProjectCard`                      | `entities/project/ui/ProjectCard.tsx`                     | entities | ✅     | Карточка проекта (presentational)                              | `formatDateRu`                                                                       | `ProjectsListWidgets`                           |
+| `ProjectsListWidgets`              | `widgets/projects-list/ui/ProjectsListWidget.tsx`         | widgets  | ✅     | Loading/error/empty/list + CreateProject                       | `useProjects`, `ProjectCard`, `CreateProject`                                        | `ProfilePage`                                   |
+| `createProjectSchema`              | `features/create-project/model/validation.ts`             | features | ✅     | Zod: title, description→null, prefix `^[A-Z]{3,5}$` (БД: 3–10) | —                                                                                    | `CreateProject`                                 |
+| `useCreateProject`                 | `features/create-project/model/useCreateProject.ts`       | features | ✅     | Mutation создания проекта + invalidate                         | `useAuth`, `createProject`, `projectKeys`, `invalidateQueries`                       | `CreateProject`                                 |
+| `CreateProject`                    | `features/create-project/ui/CreateProject.tsx`            | features | ✅     | Modal + форма, автопрефикс, длина на кнопке                    | `Modal`, `useCreateProject`, `deriveProjectPrefixFromTitle`, `mapAuthErrorToMessage` | `ProjectsListWidgets`                           |
+| `projectPrefixLettersSchema`       | `features/create-project/model/validation.ts`             | features | 📋     | Live: только `a-zA-Z` при вводе префикса                       | —                                                                                    | `CreateProject` (MVP-2)                         |
+| `existsProjectPrefixByOwner`       | `shared/api/projects/existsProjectPrefixByOwner.ts`       | API      | 📋     | Проверка дубликата `owner_id + project_prefix`                 | `withRetry` → `supabase.from('projects').select`                                     | create-project (MVP-2)                          |
+| `mapSupabaseProjectErrorToMessage` | `shared/lib/supabase/mapSupabaseProjectErrorToMessage.ts` | lib      | 📋     | Тексты ошибок projects (format, unique)                        | `isNetworkError`, коды Postgres                                                      | `CreateProject` (MVP-2)                         |
+| `getProjectRoute`                  | `shared/config/routes.ts`                                 | config   | 📋     | URL `/project/:projectId`                                      | —                                                                                    | `ProjectsListWidgets` (Link)                    |
+| `getProjectById`                   | `shared/api/projects/getProjectById.ts`                   | API      | 📋     | SELECT проекта по id                                           | `withRetry` → `supabase.from('projects').select`                                     | `getProject`                                    |
+| `getBoardsByProjectId`             | `shared/api/boards/getBoardsByProjectId.ts`               | API      | 📋     | SELECT досок по `project_id`                                   | `withRetry` → `supabase.from('boards').select`                                       | `getBoards`                                     |
+| `getProject`                       | `entities/project/api/getProject.ts`                      | entities | 📋     | Проект по id + маппинг                                         | `getProjectById`, `mapProjectRowToProject`                                           | `useProject`                                    |
+| `useProject`                       | `entities/project/api/useProject.ts`                      | entities | 📋     | Query проекта по id                                            | `useAuth`, `getProject`, `projectKeys.detail`                                        | `ProjectPage`                                   |
+| `deleteProjectById`                | `shared/api/projects/deleteProjectById.ts`                | API      | 📋     | DELETE проекта                                                 | `withRetry` → `supabase.from('projects').delete`                                     | `deleteProject`                                 |
+| `deleteProject`                    | `entities/project/api/deleteProject.ts`                   | entities | 📋     | Удаление проекта entity-слой                                   | `deleteProjectById`                                                                  | `useDeleteProject`                              |
+| `useDeleteProject`                 | `features/delete-project/model/useDeleteProject.ts`       | features | 📋     | Mutation удаления + invalidate/remove                          | `useAuth`, `deleteProject`, `projectKeys`                                            | `DeleteProject`                                 |
+| `DeleteProject`                    | `features/delete-project/ui/DeleteProject.tsx`            | features | 📋     | Кнопка + Modal подтверждения                                   | `Modal`, `useDeleteProject`                                                          | `ProjectsListWidgets`                           |
 
 ---
 
 ## 4. App / layout / прочие страницы
 
-| Имя           | Файл                                  | Слой    | Статус | Назначение                  | Собирает / вызывает     |
-| ------------- | ------------------------------------- | ------- | ------ | --------------------------- | ----------------------- |
-| `AppLayout`   | `widgets/app-layout/ui/AppLayout.tsx` | widgets | ✅     | Header + sidebar + children | `Sidebar`, `{children}` |
-| `ProjectPage` | `pages/project/ui/ProjectPage.tsx`    | pages   | 🧪     | Заглушка проекта            | —                       |
-| `ErrorPage`   | `pages/error/ui/ErrorPage.tsx`        | pages   | 🧪     | 404 / error boundary        | —                       |
+| Имя           | Файл                                  | Слой    | Статус | Назначение                                      | Собирает / вызывает     |
+| ------------- | ------------------------------------- | ------- | ------ | ----------------------------------------------- | ----------------------- |
+| `AppLayout`   | `widgets/app-layout/ui/AppLayout.tsx` | widgets | ✅     | Header + sidebar + children                     | `Sidebar`, `{children}` |
+| `ProjectPage` | `pages/project/ui/ProjectPage.tsx`    | pages   | 🧪     | Заглушка `/project/:id` — далее: проект + доски | —                       |
+| `ErrorPage`   | `pages/error/ui/ErrorPage.tsx`        | pages   | 🧪     | 404 / error boundary                            | —                       |
 
 ---
 
@@ -302,25 +317,67 @@ ProfilePage
           → formatDateRu(createdAt)
 ```
 
-### Создание проекта (черновой поток)
+### Создание проекта
+
+```
+CreateProject (Modal + форма)
+  → createProjectSchema (Zod: title, description→null, prefix ^[A-Z]{3,5}$; БД CHECK 3–10)
+  → кнопка submit: disabled если длина префикса ∉ [3, 5]
+  → useCreateProject.mutate(input)
+      → createProject
+          → mapProjectToProjectInsert
+          → createNewProject (withRetry, insert + owner_id)
+          → mapProjectRowToProjectListItem
+      → onSuccess: invalidateQueries(projectKeys.list(ownerId))
+
+Автопрефикс (onChange title, если !isPrefixTouched):
+  → deriveProjectPrefixFromTitle(title)
+      → transliterateCyrillicToLatin(первое слово)
+      → первые 3 латинские буквы → toUpperCase
+```
+
+### create-project — MVP-2 / полировка (📋 в ROADMAP)
+
+```
+Live-валидация префикса (только латиница при вводе):
+  → projectPrefixLettersSchema.safeParse(prefix) → prefixFormatError
+
+Дубликат префикса:
+  → existsProjectPrefixByOwner(ownerId, prefix)  ИЛИ  map 23505 после mutation
+  → mapSupabaseProjectErrorToMessage → «Префикс уже занят»
+```
+
+### Открытие проекта (📋 в ROADMAP)
 
 ```
 ProjectsListWidgets
-  → CreateProject
-      → useCreateProject.mutate(input)
-          → createProject
-              → mapProjectToProjectInsert
-              → createNewProject (withRetry, insert)
-              → mapProjectRowToProjectListItem
-          → onSuccess: invalidateQueries(projectKeys.list(ownerId))
+  → Link to={getProjectRoute(project.id)}
+      → ProjectCard
+  → ProjectPage
+      → useParams().projectId
+      → useProject(projectId) → getProject → getProjectById
+      → список досок → getBoardsByProjectId
+```
+
+### Удаление проекта (📋 в ROADMAP)
+
+```
+DeleteProject (на карточке, stopPropagation)
+  → Modal подтверждения
+  → useDeleteProject.mutate(projectId)
+      → deleteProject → deleteProjectById (withRetry)
+      → onSuccess: invalidateQueries(list) + removeQueries(detail)
+      → navigate(/profile) при удалении со страницы проекта
 ```
 
 ---
 
 ## Changelog registry
 
+- **2026-06-23:** ROADMAP MVP-2: live-валидация префикса, проверка дубликата, `mapSupabaseProjectErrorToMessage`; уточнён CHECK БД `^[A-Z]{3,10}$`
+- **2026-06-23:** create-project готов (✅): Modal, Zod, автопрефикс, `transliterateCyrillicToLatin`, `deriveProjectPrefixFromTitle`; в ROADMAP добавлены шаги открытия проекта и `delete-project`
 - **2026-06-23:** блок 7 профиля: `getProjectsByOwnerId`, `getProjects`, `projectKeys`, `useProjects`, `ProjectsListWidgets`, обновлён `ProjectCard`, добавлен `formatDateRu`
-- **2026-06-23:** добавлен черновик create-project: `createNewProject`, `mapProjectToProjectInsert`, `createProject`, `useCreateProject`, `CreateProject`
+- **2026-06-23:** черновик create-project: `createNewProject`, `mapProjectToProjectInsert`, `createProject`, `useCreateProject`, `CreateProject`
 - **2026-06-17:** `features/change-password`; `Modal.isCloseDisabled`; блок 3 профиля завершён
 - **2026-06-16:** `features/change-email` + `shared/ui/Modal` + `shared/api/auth/updateAuthUser`; слот `emailActions` в `ProfileWidget`
 - **2026-05-29:** `features/update-name` (блок 2): `useUpdateName`, `UpdateName`, `nameSchema`; ROADMAP — фокус блок 3
