@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Modal } from '@shared/ui'
-import { Button } from '@shared/ui'
+import { Button, Card } from '@shared/ui'
 import { useCreateProject } from '../model/useCreateProject'
 import { createProjectSchema } from '../model/validation'
 import { mapAuthErrorToMessage } from '@shared/lib'
@@ -73,7 +73,17 @@ const CreateProject = () => {
 
   return (
     <div>
-      <button onClick={handleCreateProject}>Создать проект</button>
+      <Card>
+        <button
+          onClick={handleCreateProject}
+          type="button"
+          aria-label="Создать проект"
+          className="project-tile__action"
+        >
+          <h2>Создать проект</h2>
+        </button>
+      </Card>
+
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

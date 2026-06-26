@@ -1,5 +1,6 @@
 import type { ProjectListItem } from '../model/types'
 import { formatDateRu } from '@shared/lib'
+import { Card } from '@shared/ui'
 
 interface ProjectCardProps {
   project: ProjectListItem
@@ -7,10 +8,10 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
   return (
-    <article style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left' }}>
+    <Card>
       <h2>{project.title}</h2>
       <p>{formatDateRu(project.createdAt)}</p>
-    </article>
+    </Card>
   )
 }
 

@@ -1,0 +1,37 @@
+.project-title {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 10px;
+  width: 200px;
+  min-height: 100px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.project-tile h2 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-tile__action {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.project-tile__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
