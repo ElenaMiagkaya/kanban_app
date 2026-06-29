@@ -3,6 +3,7 @@ import { ProjectCard } from '@entities/project'
 import { CreateProject } from '@features/create-project'
 import { Link } from 'react-router-dom'
 import { getProjectRoute } from '@shared/config'
+import { DeleteProject } from '@features/delete-project'
 
 const ProjectsListWidgets = () => {
   const { data: projects, isPending, isError, error, isLoading, user } = useProjects()
@@ -24,9 +25,12 @@ const ProjectsListWidgets = () => {
           projects &&
           projects.length > 0 &&
           projects.map((project) => (
-            <Link className="project-tile__link" to={getProjectRoute(project.id)} key={project.id}>
-              <ProjectCard project={project} />
-            </Link>
+            <div key={project.id} style={{ position: 'relative' }}>
+              <Link className="project-title__link" to={getProjectRoute(project.id)}>
+                <ProjectCard project={project} />
+              </Link>
+              <DeleteProject projectId={project.id} />
+            </div>
           ))}
         <CreateProject />
       </div>

@@ -28,13 +28,13 @@
 
 ### Как устроены слои (для первого раза)
 
-| Слой               | Роль                                                                                                                                                            |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shared/ui`        | `**UserAvatar`\*\* — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                       |
-| `entities/profile` | `Profile`, `useProfile`, `updateProfile`, `**ProfileCard**` — layout и **слоты**. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
-| `features/`\*      | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                        |
-| `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                    |
-| `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                |
+| Слой               | Роль                                                                                                                                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared/ui`        | `**UserAvatar` — круг: фото / инициалы / пустой; пропсы `src?`, `name?`, `size?`. Без mutation и без знания `Profile`                                             |
+| `entities/profile` | `Profile`, `useProfile`, `updateProfile`, `**ProfileCard`** — layout и **слоты\*\*. В блоке аватара: `<UserAvatar />`, не своя логика круга. Без импорта features |
+| `features/`        | Действия пользователя (кнопки, формы, mutation, модалки)                                                                                                          |
+| `widgets/profile`  | `ProfileWidget`: loading/error + **передать features в слоты** `ProfileCard`                                                                                      |
+| `widgets/sidebar`  | `<UserAvatar />` из тех же данных (`useProfile` / кеш), без кнопок upload/remove                                                                                  |
 
 **Неплоский виджет** = `ProfileWidget` рендерит **один** `ProfileCard` и прокидывает фичи так:
 
@@ -98,11 +98,11 @@ ProfileCard
 - [x] Компонент: есть `src` → `<img>`; нет фото, есть `name` → инициалы; иначе → пустой круг
 - [x] Не рендерить `<img>` с пустым `src`
 - [x] Пропсы без привязки к `Profile`: `src?`, `name?`, `size?` (для sidebar — меньший размер)
-- [x] Переиспользование: `**ProfileCard`** и `**Sidebar\*\*`
+- [x] Переиспользование: `**ProfileCard`** и `**Sidebar\*\`\*
 
 **Entity (`ProfileCard`):**
 
-- [x] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот `**userAvatar` не нужен\*\*)
+- [x] В блоке аватара: `<UserAvatar />` внутри карточки + `slots.avatarActions` (слот `**userAvatar` не нужен)
 - [x] Объект `slots` для фич; без кнопок upload/remove и без inline-`<img>` в entity
 
 **Features** (после **инфраструктуры mutation**):
@@ -163,8 +163,8 @@ ProfileCard
 - [x] `projectKeys` + `useProjects` + `enabled: !auth.isLoading && isAuth && Boolean(user?.id)`
 - [x] Виджет / секция на `ProfilePage`: **список проектов** пользователя
 - [x] Кнопка **«Создать проект»** на `/profile` — feature `create-project` (Modal + mutation)
-- [ ] Клик по карточке проекта → переход на `project/:projectId` (Link в widget, не в entity)
-- [ ] Кнопка **«Удалить проект»** на карточке (feature `delete-project`, Modal подтверждения)
+- [x] Клик по карточке проекта → переход на `project/:projectId` (Link в widget, не в entity)
+- [x] Кнопка **«Удалить проект»** на карточке (feature `delete-project`, Modal подтверждения)
 
 **Схема страницы `/profile`:**
 
@@ -248,7 +248,7 @@ ProjectPage (/project/:projectId)
 - [ ] **Дубликат префикса:** проверка `owner_id + project_prefix` до INSERT или маппинг `23505` → «Префикс уже занят»
   - вариант A: `shared/api` `existsProjectPrefix(ownerId, prefix)` (SELECT)
   - вариант B: только маппер ошибок Supabase после failed mutation
-- [ ] **`mapSupabaseProjectErrorToMessage`** (или расширить общий маппер) — не сырой `projects_prefix_format_chk` / `duplicate key`
+- [ ] `**mapSupabaseProjectErrorToMessage`\*\* (или расширить общий маппер) — не сырой `projects_prefix_format_chk` / `duplicate key`
 - [ ] Согласовать доки с БД, если изменится CHECK на `project_prefix`
 
 ### Общее

@@ -27,6 +27,8 @@ const CreateProject = () => {
     setErrorValidation(null)
     reset()
 
+    const form = e.currentTarget
+
     const formData = new FormData(e.target)
     const input = {
       title: formData.get('title') as string,
@@ -45,7 +47,7 @@ const CreateProject = () => {
         setIsOpen(false)
         setIsPrefixTouched(false)
         setProjectPrefix('')
-        e.currentTarget.reset()
+        form.reset()
       },
     })
   }
@@ -78,7 +80,7 @@ const CreateProject = () => {
           onClick={handleCreateProject}
           type="button"
           aria-label="Создать проект"
-          className="project-tile__action"
+          className="project-title__action"
         >
           <h2>Создать проект</h2>
         </button>

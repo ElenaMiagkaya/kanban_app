@@ -10,11 +10,14 @@ export const useCreateProject = () => {
   const mutation = useMutation<ProjectListItem, Error, CreateProjectInput>({
     mutationKey: ['project', 'create'],
     mutationFn: async (input: CreateProjectInput) => {
-      if (!auth.user?.id) throw new Error('Пользователь не найден')
-      return createProject(input, auth.user.id)
+      const ownerId = auth.user?.id
+      if (!ownerId) throw new Error('Пользователь не найден')
+      return createProject(input, ownerId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: projectKeys.list(auth.user.id) })
+      const ownerId = auth.user?.id
+      if (!ownerId) return
+      queryClient.invalidateQueries({ queryKey: projectKeys.list(ownerId) })
     },
   })
   return mutation

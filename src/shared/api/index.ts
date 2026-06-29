@@ -17,3 +17,4 @@ export { removeAvatarFile } from './storage/removeAvatarFile'
 // функции для работы с проектами
 export { getProjectsByOwnerId } from './projects/getProjectsByOwnerId' //список проектов по owner_id
 export { createNewProject } from './projects/createNewProject' //создание нового проекта
+export { deleteProjectById } from './projects/deleteProjectById' //удаление проекта по id

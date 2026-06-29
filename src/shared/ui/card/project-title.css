@@ -12,14 +12,14 @@
   cursor: pointer;
 }
 
-.project-tile h2 {
+.project-title h2 {
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.project-tile__action {
+.project-title__action {
   flex: 1;
   width: 100%;
   border: none;
@@ -30,7 +30,7 @@
   text-align: left;
 }
 
-.project-tile__link {
+.project-title__link {
   display: block;
   text-decoration: none;
   color: inherit;
